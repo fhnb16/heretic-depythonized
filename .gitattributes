@@ -1,1 +1,23 @@
 * text eol=lf
+
+# Binary files must never get line-ending conversion: converting CRLF in icons broke the
+# Windows resource compiler ("RC2176: old DIB") and corrupted the PNG signatures.
+*.ico binary
+*.icns binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.exe binary
+*.dll binary
+*.so binary
+*.safetensors binary
+*.parquet binary

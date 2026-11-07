@@ -1,10 +1,10 @@
-# Builds icon.ico from icon-256.png (Windows, PowerShell 7).
+# Builds app.ico from app-256.png (Windows, PowerShell 7).
 # Small sizes are stored as 32-bit BITMAPINFOHEADER DIBs with an AND mask and only the 256px
 # image as PNG: rc.exe (used by tauri-build on Windows) rejects PNG entries below 256px with
 # "error RC2176: old DIB".
 param(
-    [string]$Source = (Join-Path $PSScriptRoot "icon-256.png"),
-    [string]$Output = (Join-Path $PSScriptRoot "icon.ico"),
+    [string]$Source = (Join-Path $PSScriptRoot "app-256.png"),
+    [string]$Output = (Join-Path $PSScriptRoot "app.ico"),
     [int[]]$Sizes = @(16, 24, 32, 48, 64)
 )
 

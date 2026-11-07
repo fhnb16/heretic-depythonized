@@ -21,7 +21,7 @@ default-members = [
 ]
 
 [workspace.package]
-version = "2.1.1"
+version = "2.1.4"
 edition = "2024"
 license = "AGPL-3.0-or-later"
 authors = ["Philipp Emanuel Weidmann <pew@worldwidemann.com>", "Heretic contributors"]

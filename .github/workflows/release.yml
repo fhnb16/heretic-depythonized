@@ -105,8 +105,9 @@ jobs:
           - name: windows-x64-cpu
             os: windows-latest
             cuda: false
+          # CUDA 12 nvcc only supports Visual Studio up to 2022; windows-latest moves to VS 2026.
           - name: windows-x64-cuda12
-            os: windows-latest
+            os: windows-2022
             cuda: true
           - name: linux-x64-cpu
             os: ubuntu-22.04
@@ -116,7 +117,6 @@ jobs:
             cuda: true
     env:
       DIST: dist/heretic-${{ needs.version.outputs.version }}-${{ matrix.name }}
-      FEATURES: ${{ matrix.cuda && '--features cuda' || '' }}
 
     steps:
       - uses: actions/checkout@v6
@@ -129,13 +129,22 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev patchelf
 
-      - name: Set up MSVC (nvcc needs cl.exe)
+      - name: Set up MSVC environment (nvcc needs cl.exe)
         if: runner.os == 'Windows' && matrix.cuda
-        uses: ilammy/msvc-dev-cmd@v1
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vs) { throw "Visual Studio with C++ tools not found" }
+          Write-Host "Using $vs"
+          $vcvars = Join-Path $vs "VC\Auxiliary\Build\vcvars64.bat"
+          cmd /c "`"$vcvars`" >nul && set" | ForEach-Object {
+            if ($_ -match '^([^=]+)=(.*)$') { "$($Matches[1])=$($Matches[2])" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8 }
+          }
 
       - name: Install CUDA Toolkit (Windows)
         if: runner.os == 'Windows' && matrix.cuda
-        uses: Jimver/cuda-toolkit@v0.2.21
+        uses: Jimver/cuda-toolkit@v0.2.30
         with:
           cuda: ${{ env.CUDA_VERSION }}
           method: network
@@ -143,7 +152,7 @@ jobs:
 
       - name: Install CUDA Toolkit (Linux)
         if: runner.os == 'Linux' && matrix.cuda
-        uses: Jimver/cuda-toolkit@v0.2.21
+        uses: Jimver/cuda-toolkit@v0.2.30
         with:
           cuda: ${{ env.CUDA_VERSION }}
           method: network
@@ -158,15 +167,21 @@ jobs:
         with:
           key: ${{ matrix.name }}
 
+      # Cargo steps run in pwsh, not bash: Git Bash puts its own /usr/bin/link.exe (coreutils)
+      # in front of PATH, and with the MSVC environment set rustc takes link.exe from PATH.
       - name: Install tauri-cli
-        shell: bash
-        run: cargo tauri --version 2>/dev/null || cargo install tauri-cli --version "^2" --locked
+        shell: pwsh
+        run: |
+          cargo tauri --version 2>$null
+          if ($LASTEXITCODE -ne 0) { cargo install tauri-cli --version "^2" --locked }
 
       - name: Build CLI and GUI
-        shell: bash
+        shell: pwsh
         run: |
-          cargo build --release -p heretic $FEATURES
-          cargo build --release -p heretic-gui $FEATURES
+          $features = if ("${{ matrix.cuda }}" -eq "true") { @("--features", "cuda") } else { @() }
+          cargo build --release -p heretic @features
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          cargo build --release -p heretic-gui @features
 
       # ---------- Windows ----------
 
@@ -236,7 +251,7 @@ jobs:
             cp target/release/bundle/appimage/*.AppImage "$DIST.AppImage"
           fi
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ${{ matrix.name }}
           path: dist/*
@@ -247,7 +262,7 @@ jobs:
     needs: [version, build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           path: dist
           merge-multiple: true
