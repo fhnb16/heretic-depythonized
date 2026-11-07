@@ -48,30 +48,27 @@ jobs:
       - name: Run end-to-end tests (tiny models)
         run: cargo test --release -p heretic-session --test session -- --ignored --nocapture
 
-  frontend:
-    name: GUI frontend
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/heretic-gui
+  # The GUI frontend is plain HTML/CSS/JS without a build step (no Node.js). This renders
+  # every screen with a mocked backend in headless Edge and fails on any JavaScript error.
+  gui:
+    name: GUI screens
+    runs-on: windows-latest
 
     steps:
       - name: Check out code
         uses: actions/checkout@v6
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
+      - name: Render screens (light)
+        shell: pwsh
+        run: ./apps/heretic-gui/ui-test/screenshots.ps1 -Theme light
+
+      - name: Render screens (dark)
+        shell: pwsh
+        run: ./apps/heretic-gui/ui-test/screenshots.ps1 -Theme dark
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Type check
-        run: npm run check
-
-      - name: Unit tests
-        run: npm test
-
-      - name: Build
-        run: npm run build
+          name: ui-screenshots
+          path: target/ui-shots/*.png

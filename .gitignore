@@ -1,11 +1,11 @@
 # Rust build output
 /target/
 
-# GUI frontend
-/apps/heretic-gui/node_modules/
-/apps/heretic-gui/dist/*
-!/apps/heretic-gui/dist/index.html
+# GUI (Tauri generated files; release CI overlays)
 /apps/heretic-gui/src-tauri/gen/
+/apps/heretic-gui/src-tauri/tauri.cuda.json
+/cuda-runtime/
+/dist/
 
 # Python-generated files (legacy implementation, kept as reference until removal)
 __pycache__/

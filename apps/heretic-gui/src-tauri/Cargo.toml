@@ -29,7 +29,10 @@ heretic-session = { path = "../../../crates/heretic-session" }
 heretic-export = { path = "../../../crates/heretic-export" }
 
 [features]
-default = []
+# The frontend is plain HTML/JS in ../ui and is always embedded into the binary,
+# so a plain `cargo build` produces a working application (no dev server, no Node.js).
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
 cuda = ["heretic-engine/cuda"]
 cudnn = ["heretic-engine/cudnn"]
 mkl = ["heretic-engine/mkl"]

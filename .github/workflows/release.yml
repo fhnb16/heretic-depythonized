@@ -1,0 +1,281 @@
+# Builds and publishes a release for every commit on master.
+#
+# The version is [workspace.package] version in Cargo.toml and follows semver (bumped with
+# the change itself: patch for fixes, minor for features, major for breaking changes).
+# * The first commit carrying a new version gets the tag v<version> and a regular release.
+# * Later commits without a version bump get a build tag v<version>.<n>, where n counts the
+#   commits since v<version>, published as a pre-release (never marked "latest").
+# Pushing a tag v* by hand, or running the workflow manually with "force", rebuilds a tag.
+# Tags created here with GITHUB_TOKEN don't trigger the workflow again.
+#
+# Builds: CLI + GUI for Windows and Linux, each as CPU and CUDA variants. CUDA kernels are
+# compiled here (CUDA_COMPUTE_CAP=80, RTX 30xx and newer); the redistributable CUDA runtime
+# libraries are shipped next to the executables, so users only need the NVIDIA driver.
+# No Node.js and no Python are involved anywhere.
+
+name: Release
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Build and publish even if the tag already exists"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+  CUDA_VERSION: "12.6.3"
+  CUDA_COMPUTE_CAP: "80"
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Decide
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.decide.outputs.release }}
+      tag: ${{ steps.decide.outputs.tag }}
+      version: ${{ steps.decide.outputs.version }}
+      prerelease: ${{ steps.decide.outputs.prerelease }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # full history and tags, to count commits since the version tag
+
+      - id: decide
+        shell: bash
+        run: |
+          version=$(awk '/^\[workspace.package\]/{s=1;next} /^\[/{s=0} s && /^version *=/{gsub(/.*= *"|".*/,""); print; exit}' Cargo.toml)
+          if [[ -z "$version" ]]; then echo "::error::No version in Cargo.toml"; exit 1; fi
+          force=${{ github.event.inputs.force == 'true' }}
+          base="v$version"
+          release=true
+          prerelease=false
+
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            tag="$GITHUB_REF_NAME"
+            [[ "$tag" == "$base" ]] || prerelease=true
+          elif ! git rev-parse -q --verify "refs/tags/$base" >/dev/null; then
+            # New version: regular release.
+            tag="$base"
+          else
+            n=$(git rev-list --count "$base..HEAD")
+            if [[ "$n" == "0" ]]; then
+              # This commit is the version tag itself.
+              tag="$base"
+              release=$force
+            else
+              # Commit without a version bump: numbered build on top of the version.
+              tag="$base.$n"
+              prerelease=true
+              if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then release=$force; fi
+            fi
+          fi
+          [[ "$release" == "true" ]] || echo "Tag $tag already exists, nothing to publish"
+
+          # Semver pre-release versions (2.2.0-rc.1) are pre-releases too.
+          [[ "$version" == *-* ]] && prerelease=true
+          {
+            echo "release=$release"
+            echo "tag=$tag"
+            echo "version=${tag#v}"
+            echo "prerelease=$prerelease"
+          } >> "$GITHUB_OUTPUT"
+          echo "version=$version tag=$tag release=$release prerelease=$prerelease"
+
+  build:
+    name: Build (${{ matrix.name }})
+    needs: version
+    if: needs.version.outputs.release == 'true'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64-cpu
+            os: windows-latest
+            cuda: false
+          - name: windows-x64-cuda12
+            os: windows-latest
+            cuda: true
+          - name: linux-x64-cpu
+            os: ubuntu-22.04
+            cuda: false
+          - name: linux-x64-cuda12
+            os: ubuntu-22.04
+            cuda: true
+    env:
+      DIST: dist/heretic-${{ needs.version.outputs.version }}-${{ matrix.name }}
+      FEATURES: ${{ matrix.cuda && '--features cuda' || '' }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install GUI system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Set up MSVC (nvcc needs cl.exe)
+        if: runner.os == 'Windows' && matrix.cuda
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Install CUDA Toolkit (Windows)
+        if: runner.os == 'Windows' && matrix.cuda
+        uses: Jimver/cuda-toolkit@v0.2.21
+        with:
+          cuda: ${{ env.CUDA_VERSION }}
+          method: network
+          sub-packages: '["nvcc", "cudart", "cublas", "cublas_dev", "curand", "curand_dev", "nvrtc", "nvrtc_dev", "thrust", "visual_studio_integration"]'
+
+      - name: Install CUDA Toolkit (Linux)
+        if: runner.os == 'Linux' && matrix.cuda
+        uses: Jimver/cuda-toolkit@v0.2.21
+        with:
+          cuda: ${{ env.CUDA_VERSION }}
+          method: network
+          sub-packages: '["nvcc", "cudart", "cudart-dev", "nvrtc", "nvrtc-dev", "cccl"]'
+          non-cuda-sub-packages: '["libcublas", "libcublas-dev", "libcurand", "libcurand-dev"]'
+
+      - name: Linux CUDA builds find their libraries next to the executable
+        if: runner.os == 'Linux' && matrix.cuda
+        run: echo "RUSTFLAGS=-C link-arg=-Wl,-rpath,\$ORIGIN" >> "$GITHUB_ENV"
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.name }}
+
+      - name: Install tauri-cli
+        shell: bash
+        run: cargo tauri --version 2>/dev/null || cargo install tauri-cli --version "^2" --locked
+
+      - name: Build CLI and GUI
+        shell: bash
+        run: |
+          cargo build --release -p heretic $FEATURES
+          cargo build --release -p heretic-gui $FEATURES
+
+      # ---------- Windows ----------
+
+      - name: Collect CUDA runtime (Windows)
+        if: runner.os == 'Windows' && matrix.cuda
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force cuda-runtime | Out-Null
+          $patterns = "cudart64_*.dll", "cublas64_*.dll", "cublasLt64_*.dll", "curand64_*.dll", "nvrtc64_*.dll", "nvrtc-builtins64_*.dll"
+          foreach ($p in $patterns) {
+            $found = Get-ChildItem -Path "$env:CUDA_PATH\bin" -Recurse -Filter $p
+            if (-not $found) { throw "CUDA runtime library $p not found" }
+            $found | Copy-Item -Destination cuda-runtime
+          }
+          Get-ChildItem cuda-runtime | Format-Table Name, Length
+
+          # Tauri config overlay: install the DLLs next to heretic-gui.exe.
+          $resources = @{}
+          Get-ChildItem cuda-runtime | ForEach-Object { $resources["../../../cuda-runtime/$($_.Name)"] = $_.Name }
+          @{ bundle = @{ resources = $resources } } | ConvertTo-Json -Depth 5 | Set-Content apps/heretic-gui/src-tauri/tauri.cuda.json
+
+      - name: Build installer (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        working-directory: apps/heretic-gui/src-tauri
+        run: |
+          $command = @("tauri", "build", "--bundles", "nsis")
+          if ("${{ matrix.cuda }}" -eq "true") { $command += @("--features", "cuda", "--config", "tauri.cuda.json") }
+          cargo @command
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force $env:DIST | Out-Null
+          Copy-Item target/release/heretic.exe, target/release/heretic-gui.exe, LICENSE, README.md -Destination $env:DIST
+          if (Test-Path cuda-runtime) { Copy-Item cuda-runtime/* -Destination $env:DIST }
+          Compress-Archive -Path $env:DIST -DestinationPath "$env:DIST.zip"
+          $installer = Get-ChildItem target/release/bundle/nsis/*.exe | Select-Object -First 1
+          Copy-Item $installer.FullName "$env:DIST-setup.exe"
+          Remove-Item -Recurse $env:DIST
+
+      # ---------- Linux ----------
+
+      - name: Build packages (Linux, CPU)
+        if: runner.os == 'Linux' && !matrix.cuda
+        working-directory: apps/heretic-gui/src-tauri
+        run: cargo tauri build --bundles deb,appimage
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p "$DIST"
+          cp target/release/heretic target/release/heretic-gui LICENSE README.md "$DIST/"
+          if [[ "${{ matrix.cuda }}" == "true" ]]; then
+            lib="${CUDA_PATH:-/usr/local/cuda}/lib64"
+            for name in libcudart.so.12 libcublas.so.12 libcublasLt.so.12 libcurand.so.10 libnvrtc.so.12; do
+              cp -L "$lib/$name" "$DIST/"
+              ln -sf "$name" "$DIST/${name%.so.*}.so"
+            done
+            cp -L "$lib"/libnvrtc-builtins.so.12.* "$DIST/" 2>/dev/null || cp -L "$lib"/libnvrtc-builtins.so* "$DIST/"
+          fi
+          tar -C dist -czf "$DIST.tar.gz" "$(basename "$DIST")"
+          rm -rf "$DIST"
+          if [[ "${{ matrix.cuda }}" != "true" ]]; then
+            cp target/release/bundle/deb/*.deb "$DIST.deb"
+            cp target/release/bundle/appimage/*.AppImage "$DIST.AppImage"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish ${{ needs.version.outputs.tag }}
+    needs: [version, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums
+        working-directory: dist
+        run: sha256sum * > SHA256SUMS.txt && cat SHA256SUMS.txt
+
+      - name: Create tag and release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Heretic ${{ needs.version.outputs.tag }}
+          prerelease: ${{ needs.version.outputs.prerelease == 'true' }}
+          make_latest: ${{ needs.version.outputs.prerelease == 'true' && 'false' || 'true' }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: dist/*
+          body: |
+            | Download | For |
+            | :-- | :-- |
+            | `*-windows-x64-cuda12-setup.exe` | Windows, NVIDIA RTX 30xx or newer (installer) |
+            | `*-windows-x64-cpu-setup.exe` | Windows, any computer (installer) |
+            | `*-windows-x64-*.zip` | Portable: `heretic.exe` (CLI) and `heretic-gui.exe` |
+            | `*-linux-x64-cpu.AppImage` / `.deb` | Linux desktop application |
+            | `*-linux-x64-*.tar.gz` | Linux CLI and GUI binaries |
+
+            CUDA builds need only an NVIDIA driver (527 or newer on Windows, 525 or newer on
+            Linux); the CUDA runtime libraries are included. GPUs older than the RTX 30 series (compute capability below 8.0) are
+            not supported by the CUDA builds; use the CPU build there.
