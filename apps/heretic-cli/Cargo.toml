@@ -1,0 +1,27 @@
+[package]
+name = "heretic"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+console = "0.16.6"
+ctrlc = "3.5.2"
+heretic-core = { version = "2.1.0-dev.0", path = "../../crates/heretic-core" }
+heretic-engine = { version = "2.1.0-dev.0", path = "../../crates/heretic-engine" }
+heretic-export = { version = "2.1.0-dev.0", path = "../../crates/heretic-export" }
+heretic-optim = { version = "2.1.0-dev.0", path = "../../crates/heretic-optim" }
+heretic-plugins = { version = "2.1.0-dev.0", path = "../../crates/heretic-plugins" }
+heretic-session = { version = "2.1.0-dev.0", path = "../../crates/heretic-session" }
+indicatif = "0.18.6"
+inquire = "0.9.4"
+serde_json = { version = "1.0.154", features = ["float_roundtrip"] }
+
+[features]
+default = []
+cuda = ["heretic-engine/cuda"]
+cudnn = ["heretic-engine/cudnn"]
+mkl = ["heretic-engine/mkl"]

@@ -1,0 +1,35 @@
+[workspace]
+resolver = "3"
+members = [
+    "apps/heretic-cli",
+    "apps/heretic-gui/src-tauri",
+    "crates/heretic-core",
+    "crates/heretic-engine",
+    "crates/heretic-export",
+    "crates/heretic-optim",
+    "crates/heretic-plugins",
+    "crates/heretic-session",
+]
+default-members = [
+    "apps/heretic-cli",
+    "crates/heretic-core",
+    "crates/heretic-engine",
+    "crates/heretic-export",
+    "crates/heretic-optim",
+    "crates/heretic-plugins",
+    "crates/heretic-session",
+]
+
+[workspace.package]
+version = "2.1.0-dev.0"
+edition = "2024"
+license = "AGPL-3.0-or-later"
+authors = ["Philipp Emanuel Weidmann <pew@worldwidemann.com>", "Heretic contributors"]
+repository = "https://github.com/p-e-w/heretic"
+
+[profile.release]
+debug = "line-tables-only"
+
+# Numerical code is unusably slow without optimizations, even in tests.
+[profile.dev.package."*"]
+opt-level = 3

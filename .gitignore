@@ -1,15 +1,19 @@
-# Python-generated files
+# Rust build output
+/target/
+
+# GUI frontend
+/apps/heretic-gui/node_modules/
+/apps/heretic-gui/dist/*
+!/apps/heretic-gui/dist/index.html
+/apps/heretic-gui/src-tauri/gen/
+
+# Python-generated files (legacy implementation, kept as reference until removal)
 __pycache__/
 *.py[oc]
 build/
-dist/
 wheels/
 *.egg-info
-
-# Virtual environments
 .venv/
-
-# Caches
 /.ruff_cache/
 
 # Editors

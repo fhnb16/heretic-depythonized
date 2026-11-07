@@ -6,55 +6,72 @@ on:
   pull_request:
     branches: [master]
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
-  checks:
-    name: Check and build (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+  rust:
+    name: Rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+        os: [ubuntu-latest, windows-latest]
 
     steps:
       - name: Check out code
         uses: actions/checkout@v6
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
         with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
+          components: rustfmt, clippy
 
-      - name: Set up Python ${{ matrix.python-version }}
-        run: uv python install ${{ matrix.python-version }}
+      - name: Install GUI system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Install dependencies
-        run: uv sync --all-extras --dev
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
 
       - name: Check formatting
-        run: uv run ruff format --check .
+        run: cargo fmt --all --check
 
-      - name: Lint and check import sorting
-        run: uv run ruff check --output-format=github --extend-select I .
+      - name: Lint
+        run: cargo clippy --workspace --all-targets -- -D warnings
 
-      - name: Check typing
-        run: uv run ty check --output-format=github --error-on-warning .
+      - name: Run unit tests
+        run: cargo test --workspace
 
-      - name: Run tests
-        env:
-          PYTHONUNBUFFERED: "1"
-        run: |
-          uv run python -m unittest discover -s tests -p 'test_*.py'
-          uv run tests/run_tests.py 2>&1
+      - name: Run end-to-end tests (tiny models)
+        run: cargo test --release -p heretic-session --test session -- --ignored --nocapture
 
-      - name: Build package
-        run: uv build
+  frontend:
+    name: GUI frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/heretic-gui
 
-      - name: Verify build artifacts
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "Build failed: 'dist' directory not found."
-            exit 1
-          fi
-          echo "Build artifacts found:"
-          ls -l dist/
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type check
+        run: npm run check
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build

@@ -1,0 +1,32 @@
+[package]
+name = "heretic-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+candle-core = "0.11.1"
+candle-nn = "0.11.1"
+half = "2.7.1"
+heretic-core = { version = "2.1.0-dev.0", path = "../heretic-core" }
+rand = "0.10.3"
+rand_chacha = "0.10.0"
+safetensors = "0.8.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.154", features = ["float_roundtrip"] }
+thiserror = "2.0.21"
+
+[dev-dependencies]
+candle-transformers = "0.11.1"
+tempfile = "3.27.0"
+
+[features]
+default = []
+# NVIDIA GPU support. Requires the CUDA Toolkit (nvcc) at build time.
+cuda = ["candle-core/cuda", "candle-nn/cuda"]
+cudnn = ["cuda", "candle-core/cudnn"]
+# Faster CPU matrix multiplication on Intel CPUs.
+mkl = ["candle-core/mkl", "candle-nn/mkl"]

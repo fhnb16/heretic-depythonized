@@ -1,0 +1,25 @@
+[package]
+name = "heretic-export"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+base64 = "0.23.1"
+candle-core = "0.11.1"
+half = "2.7.1"
+heretic-core = { version = "2.1.0-dev.0", path = "../heretic-core" }
+heretic-engine = { version = "2.1.0-dev.0", path = "../heretic-engine" }
+memmap2 = "0.9.12"
+safetensors = "0.8.0"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.154", features = ["float_roundtrip"] }
+sha2 = "0.11.1"
+ureq = { version = "3.5.1", features = ["json"] }
+yaml-rust2 = "0.13.0"
+
+[dev-dependencies]
+tempfile = "3.27.0"

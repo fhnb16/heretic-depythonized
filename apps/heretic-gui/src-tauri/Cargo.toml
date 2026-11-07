@@ -1,0 +1,35 @@
+[package]
+name = "heretic-gui"
+description = "Heretic desktop application"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "heretic_gui_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+ureq = { version = "3", features = ["json"] }
+heretic-core = { path = "../../../crates/heretic-core" }
+heretic-engine = { path = "../../../crates/heretic-engine" }
+heretic-optim = { path = "../../../crates/heretic-optim" }
+heretic-plugins = { path = "../../../crates/heretic-plugins" }
+heretic-session = { path = "../../../crates/heretic-session" }
+heretic-export = { path = "../../../crates/heretic-export" }
+
+[features]
+default = []
+cuda = ["heretic-engine/cuda"]
+cudnn = ["heretic-engine/cudnn"]
+mkl = ["heretic-engine/mkl"]

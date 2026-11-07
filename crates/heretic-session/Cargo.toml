@@ -1,0 +1,22 @@
+[package]
+name = "heretic-session"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow = "1.0.104"
+heretic-core = { version = "2.1.0-dev.0", path = "../heretic-core" }
+heretic-engine = { version = "2.1.0-dev.0", path = "../heretic-engine" }
+heretic-export = { version = "2.1.0-dev.0", path = "../heretic-export" }
+heretic-optim = { version = "2.1.0-dev.0", path = "../heretic-optim" }
+heretic-plugins = { version = "2.1.0-dev.0", path = "../heretic-plugins" }
+rand = "0.10.3"
+regex = "1.13.1"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = { version = "1.0.154", features = ["float_roundtrip"] }
+
+[dev-dependencies]
+tempfile = "3.27.0"
