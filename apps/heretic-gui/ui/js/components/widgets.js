@@ -86,7 +86,7 @@ export function modal({ title, body, buttons = [], width = "520px", onclose = nu
       { class: "modal card", style: `width: ${width}`, role: "dialog", "aria-modal": "true" },
       h(
         "div",
-        { class: "row" },
+        { class: "row modal-head" },
         h("h2", { class: "grow" }, title),
         h("button", { class: "ghost icon-only", "aria-label": t("close"), title: t("close"), onclick: close }, icon("x")),
       ),

@@ -1,0 +1,101 @@
+/* Frost: liquid glass. Large radii, translucent layers over blur, a hairline light edge; the
+   sidebar floats as a glass panel; buttons are glass capsules. */
+
+:root[data-skin="frost"] {
+  --bar: rgba(255, 255, 255, 0.55);
+  --bar-line: rgba(0, 0, 0, 0.06);
+  --glass-edge: rgba(255, 255, 255, 0.55);
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+  --chip-r: 999px;
+  /* Glass needs something to blur: soft spots of the accent and the companion color. */
+  --page:
+    radial-gradient(circle at 18% 8%, var(--tint-soft), transparent 42%),
+    radial-gradient(circle at 88% 34%, color-mix(in srgb, var(--companion) 28%, transparent), transparent 46%),
+    radial-gradient(circle at 30% 80%, color-mix(in srgb, var(--tint) 18%, transparent), transparent 50%),
+    var(--bg);
+  --hero-size: 34px;
+  --hero-weight: 700;
+  --hero-tracking: -0.03em;
+
+  --sw-w: 51px;
+  --sw-h: 31px;
+  --sw-r: 16px;
+  --sw-thumb: 27px;
+  --sw-off: rgba(120, 120, 128, 0.32);
+  --sw-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  --seg-r: 999px;
+  --seg-line: var(--glass-edge);
+  --seg-text: var(--text);
+  --seg-on: var(--surface-press);
+  --seg-on-text: var(--text);
+  --seg-bg: var(--surface);
+
+  --btn-r: 999px;
+  --btn-bg: var(--surface);
+  --btn-border: var(--glass-edge);
+  --btn-color: var(--text);
+  --btn-weight: 600;
+  --btn-shadow: inset 0 1px 0 var(--glass-edge), 0 4px 14px var(--shadow-soft);
+  --btn-hover-bg: var(--surface-press);
+  --btn-press-bg: var(--surface-press);
+  --btn-press-color: var(--text);
+  --btn-press-border: var(--glass-edge);
+  --btn-press-move: scale(0.97);
+  --primary-border: transparent;
+  --primary-shadow: 0 4px 14px var(--shadow-soft);
+  --danger-bg: var(--surface);
+  --danger-border: var(--glass-edge);
+
+  --card-bg: var(--surface);
+  --card-border: 0.5px solid var(--glass-edge);
+  --card-radius: 22px;
+  --card-shadow: 0 8px 28px var(--shadow-soft), inset 0 1px 0 var(--glass-edge);
+
+  --side-bg: var(--bar);
+  --side-border: 0.5px solid var(--glass-edge);
+  --side-shadow: 0 10px 34px var(--shadow-soft), inset 0 1px 0 var(--glass-edge);
+  --side-item-r: 16px;
+  --side-active-shadow: inset 0 1px 0 var(--glass-edge);
+
+  --bubble-user-bg: var(--tint);
+  --bubble-user-color: var(--on-tint);
+
+  --modal-r: 28px;
+  --modal-bg: rgba(255, 255, 255, 0.66);
+  --modal-border: 0.5px solid rgba(255, 255, 255, 0.72);
+  --modal-shadow: 0 24px 60px rgba(0, 0, 0, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --modal-blur: blur(3px);
+  --overlay: rgba(0, 0, 0, 0.2);
+}
+
+:root[data-skin="frost"][data-theme="dark"] {
+  --bar: rgba(22, 22, 26, 0.5);
+  --bar-line: rgba(255, 255, 255, 0.08);
+  --glass-edge: rgba(255, 255, 255, 0.16);
+  --thumb: #f5f5f7;
+  --modal-bg: rgba(30, 30, 34, 0.62);
+  --modal-border: 0.5px solid rgba(255, 255, 255, 0.16);
+  --modal-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --overlay: rgba(0, 0, 0, 0.38);
+}
+
+:root[data-skin="frost"] .card,
+:root[data-skin="frost"] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button),
+:root[data-skin="frost"] .segmented {
+  -webkit-backdrop-filter: saturate(170%) blur(20px);
+  backdrop-filter: saturate(170%) blur(20px);
+}
+
+/* The sidebar floats: margins from the window edges, a large radius, glass. */
+:root[data-skin="frost"] aside {
+  margin: 12px 0 12px 12px;
+  border: 0.5px solid var(--glass-edge);
+  border-radius: 24px;
+  -webkit-backdrop-filter: saturate(190%) blur(28px);
+  backdrop-filter: saturate(190%) blur(28px);
+}
+
+:root[data-skin="frost"] .modal {
+  -webkit-backdrop-filter: saturate(200%) blur(34px);
+  backdrop-filter: saturate(200%) blur(34px);
+}

@@ -1,0 +1,78 @@
+/* Lounge: a dense dark chat. Messages without cards, row highlight on press, bold names, a dark
+   column of tabs with a plate under the selected one; the switch turns green when on. */
+
+:root[data-skin="lounge"] {
+  --bar: #2b2d31;
+  --bar-line: #1f2023;
+  --shadow-soft: rgba(0, 0, 0, 0.3);
+  --chip-r: 4px;
+  --hero-size: 24px;
+  --hero-weight: 700;
+  --title-weight: 600;
+
+  --sw-h: 24px;
+  --sw-r: 12px;
+  --sw-pad: 3px;
+  --sw-off: #80848e;
+  --sw-on: var(--ok);
+  --sw-shadow: none;
+  --seg-r: 4px;
+  --seg-on: var(--surface-press);
+  --seg-on-text: var(--text);
+
+  --btn-r: 4px;
+  --btn-border: transparent;
+  --btn-bg: color-mix(in srgb, var(--text) 10%, transparent);
+  --btn-color: var(--text);
+  --btn-hover-bg: color-mix(in srgb, var(--text) 16%, transparent);
+
+  --card-border: 0;
+  --card-radius: 8px;
+
+  --side-bg: #1e1f22;
+  --side-border: 0;
+  --side-text: #949ba4;
+  --side-item-r: 8px;
+  --side-hover-bg: #35373c;
+  --side-active-bg: #404249;
+  --side-active-color: #ffffff;
+  --side-active-icon: #ffffff;
+  --side-brand: #f2f3f5;
+
+  --bubble-user-bg: transparent;
+  --bubble-r: 4px;
+
+  --modal-r: 18px;
+  --modal-blur: blur(4px);
+  --overlay: rgba(0, 0, 0, 0.38);
+}
+
+:root[data-skin="lounge"][data-theme="light"] {
+  --bar: #f2f3f5;
+  --bar-line: #e3e5e8;
+  --sw-off: #b5bac1;
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+  --side-bg: #e3e5e8;
+  --side-text: #4e5058;
+  --side-hover-bg: #d7d9dc;
+  --side-active-bg: #c4c9ce;
+  --side-active-color: #060607;
+  --side-active-icon: #060607;
+  --side-brand: #060607;
+}
+
+/* Messages are rows, not cards: highlight on hover. */
+:root[data-skin="lounge"] .bubble.assistant {
+  background: transparent;
+  max-width: 100%;
+}
+
+:root[data-skin="lounge"] .bubble:hover {
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+:root[data-skin="lounge"] .bubble.user {
+  align-self: stretch;
+  max-width: 100%;
+  font-weight: 600;
+}

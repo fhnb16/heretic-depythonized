@@ -710,6 +710,27 @@ impl Session {
         }
     }
 
+    /// Saves the model with the currently applied trial as a GGUF file. `output` is a `.gguf`
+    /// file or a folder; quantized types use `llama_cpp_dir`, or the setting of the same name.
+    pub fn save_gguf(
+        &self,
+        output: &std::path::Path,
+        kind: heretic_export::gguf::GgufType,
+        llama_cpp_dir: Option<&std::path::Path>,
+    ) -> Result<heretic_export::gguf::GgufExport> {
+        self.phase(Phase::Exporting);
+        let model = self.require_model()?;
+        let configured = self.settings.llama_cpp_dir.as_deref().map(std::path::Path::new);
+        let name = format!(
+            "{}-heretic",
+            std::path::Path::new(&self.settings.model)
+                .file_name()
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_else(|| "model".into())
+        );
+        heretic_export::gguf::export_gguf(model, &name, output, kind, llama_cpp_dir.or(configured), &self.reporter)
+    }
+
     /// The model card for the currently applied trial.
     pub fn model_card(&self) -> Result<String> {
         let model = self.require_model()?;

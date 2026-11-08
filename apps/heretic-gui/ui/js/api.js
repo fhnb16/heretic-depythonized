@@ -24,11 +24,17 @@ export const api = {
   chatSend: (messages, useAdapters) => invoke("chat_send", { messages, useAdapters }),
   chatStop: () => invoke("chat_stop"),
   saveModel: (directory, strategy) => invoke("save_model", { directory, strategy }),
+  saveGguf: (directory, ggufType, llamaCppDir) => invoke("save_gguf", { directory, ggufType, llamaCppDir }),
+  checkLlamaCpp: (directory) => invoke("check_llama_cpp", { directory }),
   hfWhoami: (token) => invoke("hf_whoami", { token }),
   uploadModel: (token, repoId, isPrivate, strategy) =>
     invoke("upload_model", { token, repoId, private: isPrivate, strategy }),
   modelCardPreview: () => invoke("model_card_preview"),
   forgetToken: () => invoke("forget_token"),
+  currentVersion: () => invoke("update_current_version"),
+  checkUpdate: (includePrereleases) => invoke("check_update", { includePrereleases }),
+  installUpdate: (request) => invoke("install_update", { request }),
+  openReleasePage: (url) => invoke("open_release_page", { url }),
 };
 
 /** Formats a byte count for humans. */

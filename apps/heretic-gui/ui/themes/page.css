@@ -1,0 +1,47 @@
+/* Page: a clean sheet. White page, serif headings, thin frames, gray tag plates, no graphics
+   beyond what's needed. */
+
+:root[data-skin="page"] {
+  --bar: #f7f7f5;
+  --bar-line: #e9e9e7;
+  --shadow-soft: rgba(15, 15, 15, 0.08);
+  --chip-r: 3px;
+  --hero-size: 34px;
+  --hero-weight: 700;
+  --hero-tracking: -0.01em;
+  --title-weight: 600;
+
+  --sw-w: 30px;
+  --sw-h: 18px;
+  --sw-r: 9px;
+  --sw-thumb: 14px;
+  --sw-off: #d3d1cb;
+  --sw-shadow: none;
+  --seg-r: 4px;
+  --seg-on: var(--surface-press);
+  --seg-on-text: var(--text);
+
+  --btn-r: 3px;
+  --btn-border: var(--sep-strong);
+  --btn-color: var(--text);
+  --btn-hover-bg: var(--surface-press);
+
+  --card-radius: 4px;
+
+  --side-item-r: 3px;
+  --side-active-bg: color-mix(in srgb, var(--text) 8%, transparent);
+  --side-active-color: var(--text);
+
+  --bubble-user-bg: var(--surface-press);
+
+  --modal-r: 6px;
+  --modal-bg: var(--surface);
+  --modal-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 14px 40px rgba(0, 0, 0, 0.18);
+}
+
+:root[data-skin="page"][data-theme="dark"] {
+  --bar: #202020;
+  --bar-line: #2f2f2f;
+  --sw-off: #4a4a4a;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+}

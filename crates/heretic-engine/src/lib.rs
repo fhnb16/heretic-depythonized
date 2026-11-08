@@ -5,6 +5,7 @@
 //! generation, and access to residuals, module inputs/outputs and LoRA adapters.
 
 pub mod config;
+pub mod deltanet;
 pub mod device;
 pub mod generate;
 pub mod lora;

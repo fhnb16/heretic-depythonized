@@ -1,0 +1,607 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+
+/*
+  Catalog layer. Active only while a catalog theme is selected: store.applyTheme() sets
+  <html data-skin="<id>"> (the app's own "heretic" theme has no data-skin and never sees this file).
+
+  The palette, font, radii and the computed accent come from js/themes.js as inline variables on
+  <html>. This file maps the catalog's component tokens onto the app's components; each
+  themes/<id>.css then sets those tokens (and a few rules of its own) like the catalog does.
+
+  Selector of an "action" button (catalog .btn): any <button> that is not navigation, a selectable
+  card, a segment, a disclosure toggle or a ghost button.
+*/
+
+:root[data-skin] {
+  /* Catalog token names, as aliases of the app's tokens. */
+  --tint: var(--accent);
+  --tint-press: var(--accent-2);
+  --tint-soft: var(--accent-soft);
+  --on-tint: var(--on-accent);
+  --tint-text: var(--accent-ink);
+  --sep: var(--border);
+  --sep-strong: var(--border-strong);
+  --surface-press: var(--surface-2);
+  --bg-elev: var(--surface-elev);
+  --danger: var(--bad);
+  --ok: var(--good);
+  --on-danger: #ffffff;
+  --thumb: #ffffff;
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+  --bar: var(--surface-elev);
+  --bar-line: var(--border);
+  --chip-r: var(--radius-sm);
+  --dur: 160ms;
+
+  /* Page background (gradients allowed). */
+  --page: var(--bg);
+  --base-size: 14px;
+
+  /* Screen title (catalog .hero__title) and section titles (catalog .group__title). */
+  --hero-size: 28px;
+  --hero-weight: 600;
+  --hero-tracking: 0;
+  --hero-transform: none;
+  --hero-color: var(--text);
+  --hero-shadow: none;
+  --hero-font: var(--font-display);
+  --title-transform: none;
+  --title-tracking: 0;
+  --title-color: var(--text);
+  --title-weight: 600;
+  --title-font: var(--font-display);
+  /* Text that sits directly on the page background (Aero paints it on a blue desktop). */
+  --on-page: var(--text);
+  --on-page-2: var(--text-2);
+  --on-page-shadow: none;
+
+  /* Switch (checkboxes are drawn as switches). */
+  --sw-w: 40px;
+  --sw-h: 22px;
+  --sw-r: 11px;
+  --sw-thumb: 18px;
+  --sw-thumb-r: 50%;
+  --sw-pad: 2px;
+  --sw-off: var(--sep-strong);
+  --sw-on: var(--tint);
+  --sw-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --sw-track-shadow: 0 0 #0000;
+  --sw-track-shadow-on: 0 0 #0000;
+  --thumb-on: var(--thumb);
+  --sw-thumb-on-scale: 1;
+
+  /* Segmented control. */
+  --seg-r: var(--radius-sm);
+  --seg-line: var(--sep-strong);
+  --seg-text: var(--text-2);
+  --seg-on: var(--tint);
+  --seg-on-text: var(--on-tint);
+  --seg-bg: transparent;
+  --seg-pad: 0px;
+  --seg-item-r: 0px;
+  --seg-item-bg: transparent;
+  --seg-item-shadow: 0 0 #0000;
+  --seg-on-shadow: 0 0 #0000;
+  --seg-weight: 500;
+  --seg-transform: none;
+
+  /* Fields. */
+  --field-line: var(--sep-strong);
+  --field-shadow: 0 0 #0000;
+  --field-r: var(--radius-sm);
+
+  /* Action buttons (catalog .btn: outlined in the accent by default). */
+  --btn-r: var(--radius-btn);
+  --btn-bw: 1px;
+  --btn-bg: transparent;
+  --btn-border: var(--tint);
+  --btn-color: var(--tint-text);
+  --btn-shadow: 0 0 #0000;
+  --btn-text-shadow: none;
+  --btn-weight: 500;
+  --btn-transform: none;
+  --btn-hover-bg: var(--tint-soft);
+  --btn-hover-color: var(--btn-color);
+  --btn-hover-border: var(--btn-border);
+  --btn-hover-shadow: var(--btn-shadow);
+  --btn-press-bg: var(--tint);
+  --btn-press-color: var(--on-tint);
+  --btn-press-border: var(--tint);
+  --btn-press-shadow: 0 0 #0000;
+  --btn-press-move: scale(0.98);
+  --primary-bg: var(--tint);
+  --primary-border: var(--tint);
+  --primary-color: var(--on-tint);
+  --primary-shadow: 0 0 #0000;
+  --primary-text-shadow: none;
+  --primary-hover-bg: var(--tint-press);
+  --primary-hover-color: var(--primary-color);
+  --primary-press-bg: var(--tint-press);
+  --primary-press-color: var(--primary-color);
+  --danger-bg: transparent;
+  --danger-border: var(--danger);
+  --danger-color: var(--danger);
+  --danger-press-bg: var(--danger);
+  --danger-press-color: var(--on-danger);
+  --ghost-color: var(--text-2);
+
+  /* Cards (catalog .list / .card / .post). */
+  --card-bg: var(--surface);
+  --card-border: 1px solid var(--sep);
+  --card-shadow: 0 0 #0000;
+  --card-radius: var(--radius);
+  --card-hover-bg: var(--surface-press);
+
+  /* Sidebar (catalog .tab-bar in its desktop form). */
+  --side-bg: var(--bar);
+  --side-border: 1px solid var(--bar-line);
+  --side-shadow: none;
+  --side-brand: var(--text);
+  --side-text: var(--text-2);
+  --side-text-shadow: none;
+  --side-weight: 400;
+  --side-transform: none;
+  --side-tracking: 0;
+  --side-item-r: var(--radius);
+  --side-item-bg: transparent;
+  --side-item-border: transparent;
+  --side-item-shadow: 0 0 #0000;
+  --side-item-h: 40px;
+  --side-gap: 2px;
+  --side-hover-bg: color-mix(in srgb, var(--text) 6%, transparent);
+  --side-hover-color: var(--text);
+  --side-active-bg: var(--tint-soft);
+  --side-active-color: var(--text);
+  --side-active-icon: var(--tint-text);
+  --side-active-border: transparent;
+  --side-active-shadow: 0 0 #0000;
+
+  /* Progress (catalog .meter / .progress). */
+  --meter-h: 6px;
+  --meter-r: 3px;
+  --meter-track: var(--surface-press);
+  --meter-track-shadow: 0 0 #0000;
+  --meter-fill: var(--tint);
+  --meter-fill-shadow: 0 0 #0000;
+
+  /* Dialog (catalog .modal). */
+  --overlay: rgba(0, 0, 0, 0.45);
+  --modal-r: var(--card-radius);
+  --modal-bg: var(--bg-elev);
+  --modal-border: 1px solid var(--sep);
+  --modal-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  --modal-head-bg: transparent;
+  --modal-head-text: var(--text);
+  --modal-head-border: 0;
+  --modal-title-font: var(--font-display);
+  --modal-blur: none;
+
+  /* Chat bubbles and tables. */
+  --bubble-r: var(--card-radius);
+  --bubble-user-bg: var(--surface-press);
+  --bubble-user-color: var(--text);
+  --bubble-user-r: var(--bubble-r);
+  --bubble-assistant-r: var(--bubble-r);
+  --th-color: var(--text-3);
+  --th-transform: none;
+  --th-tracking: 0;
+  --log-bg: var(--surface-press);
+  --log-border: 0;
+}
+
+/* ---------- Page ---------- */
+
+:root[data-skin] body {
+  background: var(--page);
+  font-size: var(--base-size);
+}
+
+:root[data-skin] h1 {
+  font-family: var(--hero-font);
+  font-size: var(--hero-size);
+  line-height: 1.2;
+  font-weight: var(--hero-weight);
+  letter-spacing: var(--hero-tracking);
+  text-transform: var(--hero-transform);
+  color: var(--hero-color);
+  text-shadow: var(--hero-shadow);
+}
+
+:root[data-skin] h2,
+:root[data-skin] .card > h3,
+:root[data-skin] .card > .row > h3:not(.ellipsis) {
+  font-family: var(--title-font);
+  font-weight: var(--title-weight);
+  letter-spacing: var(--title-tracking);
+  text-transform: var(--title-transform);
+  color: var(--title-color);
+}
+
+:root[data-skin] main > .view > * > .page-head h1,
+:root[data-skin] main > .view > * > h1,
+:root[data-skin] main > .view > * > section > h2 {
+  color: var(--on-page);
+  text-shadow: var(--on-page-shadow);
+}
+
+:root[data-skin] main > .view > * > .page-head .muted {
+  color: var(--on-page-2);
+  text-shadow: var(--on-page-shadow);
+}
+
+/* ---------- Action buttons ---------- */
+
+:root[data-skin] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button) {
+  border-style: solid;
+  border-width: var(--btn-bw);
+  border-color: var(--btn-border);
+  border-radius: var(--btn-r);
+  background: var(--btn-bg);
+  color: var(--btn-color);
+  box-shadow: var(--btn-shadow);
+  text-shadow: var(--btn-text-shadow);
+  font-weight: var(--btn-weight);
+  text-transform: var(--btn-transform);
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform 80ms var(--ease);
+}
+
+:root[data-skin] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button):hover:not(:disabled) {
+  background: var(--btn-hover-bg);
+  border-color: var(--btn-hover-border);
+  color: var(--btn-hover-color);
+  box-shadow: var(--btn-hover-shadow);
+}
+
+:root[data-skin] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button):active:not(:disabled) {
+  background: var(--btn-press-bg);
+  border-color: var(--btn-press-border);
+  color: var(--btn-press-color);
+  box-shadow: var(--btn-press-shadow);
+  transform: var(--btn-press-move);
+}
+
+:root[data-skin] button.primary:not(.ghost) {
+  border-color: var(--primary-border);
+  background: var(--primary-bg);
+  color: var(--primary-color);
+  box-shadow: var(--primary-shadow);
+  text-shadow: var(--primary-text-shadow);
+}
+
+:root[data-skin] button.primary:not(.ghost):hover:not(:disabled) {
+  border-color: var(--primary-border);
+  background: var(--primary-hover-bg);
+  color: var(--primary-hover-color);
+  box-shadow: var(--primary-shadow);
+}
+
+:root[data-skin] button.primary:not(.ghost):active:not(:disabled) {
+  background: var(--primary-press-bg);
+  color: var(--primary-press-color);
+  box-shadow: var(--btn-press-shadow);
+}
+
+:root[data-skin] button.danger:not(.ghost) {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-color);
+}
+
+:root[data-skin] button.danger:not(.ghost):hover:not(:disabled) {
+  border-color: var(--danger-border);
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger-color);
+}
+
+:root[data-skin] button.danger:not(.ghost):active:not(:disabled) {
+  background: var(--danger-press-bg);
+  color: var(--danger-press-color);
+}
+
+:root[data-skin] button.ghost {
+  border-radius: var(--btn-r);
+  color: var(--ghost-color);
+}
+
+:root[data-skin] button.ghost:hover:not(:disabled) {
+  background: var(--tint-soft);
+  color: var(--text);
+}
+
+:root[data-skin] button.ghost.danger {
+  color: var(--danger);
+}
+
+/* ---------- Segmented control ---------- */
+
+:root[data-skin] .segmented {
+  gap: var(--seg-pad);
+  padding: var(--seg-pad);
+  border: 1px solid var(--seg-line);
+  border-radius: var(--seg-r);
+  background: var(--seg-bg);
+  overflow: hidden;
+}
+
+:root[data-skin] .segmented > button {
+  min-height: 30px;
+  border: 0;
+  border-left: 1px solid var(--seg-line);
+  border-radius: var(--seg-item-r);
+  background: var(--seg-item-bg);
+  box-shadow: var(--seg-item-shadow);
+  color: var(--seg-text);
+  font-weight: var(--seg-weight);
+  text-transform: var(--seg-transform);
+}
+
+:root[data-skin] .segmented > button:first-child {
+  border-left: 0;
+}
+
+:root[data-skin] .segmented > button:hover:not(:disabled) {
+  background: var(--seg-item-bg);
+  color: var(--text);
+  box-shadow: var(--seg-item-shadow), inset 0 0 0 999px color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+:root[data-skin] .segmented > button.active,
+:root[data-skin] .segmented > button.active:hover:not(:disabled) {
+  background: var(--seg-on);
+  color: var(--seg-on-text);
+  box-shadow: var(--seg-on-shadow);
+}
+
+/* ---------- Switch ---------- */
+
+:root[data-skin] input[type="checkbox"] {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  flex: none;
+  width: var(--sw-w);
+  height: var(--sw-h);
+  margin: 0;
+  border: 0;
+  border-radius: var(--sw-r);
+  background: var(--sw-off);
+  box-shadow: var(--sw-track-shadow);
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+:root[data-skin] input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: var(--sw-pad);
+  left: var(--sw-pad);
+  width: var(--sw-thumb);
+  height: var(--sw-thumb);
+  border-radius: var(--sw-thumb-r);
+  background: var(--thumb);
+  box-shadow: var(--sw-shadow);
+  transition: transform var(--dur) var(--ease);
+}
+
+:root[data-skin] input[type="checkbox"]:checked {
+  background: var(--sw-on);
+  box-shadow: var(--sw-track-shadow-on);
+}
+
+:root[data-skin] input[type="checkbox"]:checked::before {
+  background: var(--thumb-on);
+  transform: translateX(calc(var(--sw-w) - var(--sw-thumb) - 2 * var(--sw-pad))) scale(var(--sw-thumb-on-scale));
+}
+
+:root[data-skin] input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--tint);
+  outline-offset: 2px;
+}
+
+/* ---------- Range ---------- */
+
+:root[data-skin] input[type="range"]::-webkit-slider-runnable-track {
+  height: var(--meter-h);
+  border-radius: var(--meter-r);
+  background: var(--meter-track);
+  box-shadow: var(--meter-track-shadow);
+}
+
+:root[data-skin] input[type="range"]::-webkit-slider-thumb {
+  margin-top: calc((var(--meter-h) - 16px) / 2);
+  border-radius: var(--sw-thumb-r);
+  background: var(--tint);
+  border: 2px solid var(--thumb);
+  box-shadow: var(--sw-shadow);
+}
+
+/* ---------- Fields ---------- */
+
+:root[data-skin] input[type="text"],
+:root[data-skin] input[type="password"],
+:root[data-skin] input[type="number"],
+:root[data-skin] select,
+:root[data-skin] textarea {
+  background: var(--field);
+  border-color: var(--field-line);
+  border-radius: var(--field-r);
+  box-shadow: var(--field-shadow);
+}
+
+:root[data-skin] input[type="text"]:focus,
+:root[data-skin] input[type="password"]:focus,
+:root[data-skin] input[type="number"]:focus,
+:root[data-skin] select:focus,
+:root[data-skin] textarea:focus {
+  border-color: var(--tint);
+  box-shadow: var(--field-shadow), 0 0 0 3px var(--tint-soft);
+}
+
+/* ---------- Cards ---------- */
+
+:root[data-skin] .card {
+  background: var(--card-bg);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+}
+
+:root[data-skin] button.card:hover:not(:disabled) {
+  background: var(--card-hover-bg);
+}
+
+:root[data-skin] .card:is(.selected, .active),
+:root[data-skin] .card:is(.selected, .active):hover:not(:disabled) {
+  box-shadow: inset 0 0 0 2px var(--tint), var(--card-shadow);
+}
+
+:root[data-skin] .model-card {
+  background: var(--surface-press);
+  box-shadow: none;
+}
+
+:root[data-skin] .error-box {
+  border-radius: var(--card-radius);
+}
+
+/* ---------- Sidebar ---------- */
+
+:root[data-skin] aside {
+  background: var(--side-bg);
+  border-right: var(--side-border);
+  box-shadow: var(--side-shadow);
+}
+
+:root[data-skin] .brand {
+  color: var(--side-brand);
+}
+
+:root[data-skin] nav {
+  gap: var(--side-gap);
+}
+
+:root[data-skin] .nav {
+  position: relative;
+  min-height: var(--side-item-h);
+  border-radius: var(--side-item-r);
+  border-color: var(--side-item-border);
+  background: var(--side-item-bg);
+  box-shadow: var(--side-item-shadow);
+  color: var(--side-text);
+  font-weight: var(--side-weight);
+  text-transform: var(--side-transform);
+  letter-spacing: var(--side-tracking);
+  text-shadow: var(--side-text-shadow);
+}
+
+:root[data-skin] .nav:hover:not(:disabled) {
+  background: var(--side-hover-bg);
+  color: var(--side-hover-color);
+}
+
+:root[data-skin] .nav.active,
+:root[data-skin] .nav.active:hover:not(:disabled) {
+  background: var(--side-active-bg);
+  border-color: var(--side-active-border);
+  box-shadow: var(--side-active-shadow);
+  color: var(--side-active-color);
+  font-weight: var(--side-weight);
+}
+
+:root[data-skin] .nav.active .icon {
+  color: var(--side-active-icon);
+}
+
+/* ---------- Progress, log, tables, chat ---------- */
+
+:root[data-skin] .progress {
+  height: var(--meter-h);
+  border-radius: var(--meter-r);
+  background: var(--meter-track);
+  box-shadow: var(--meter-track-shadow);
+}
+
+:root[data-skin] .progress > div {
+  border-radius: var(--meter-r);
+  background: var(--meter-fill);
+  box-shadow: var(--meter-fill-shadow);
+}
+
+:root[data-skin] .log,
+:root[data-skin] .card-preview {
+  background: var(--log-bg);
+  border: var(--log-border);
+  border-radius: var(--radius-sm);
+}
+
+:root[data-skin] th {
+  color: var(--th-color);
+  text-transform: var(--th-transform);
+  letter-spacing: var(--th-tracking);
+}
+
+:root[data-skin] .bubble {
+  border-radius: var(--bubble-r);
+}
+
+:root[data-skin] .bubble.user {
+  background: var(--bubble-user-bg);
+  color: var(--bubble-user-color);
+  border-radius: var(--bubble-user-r);
+}
+
+:root[data-skin] .bubble.assistant {
+  background: var(--card-bg);
+  border: var(--card-border);
+  box-shadow: var(--card-shadow);
+  border-radius: var(--bubble-assistant-r);
+}
+
+/* ---------- Dialog ---------- */
+
+:root[data-skin] .backdrop {
+  background: var(--overlay);
+  -webkit-backdrop-filter: var(--modal-blur);
+  backdrop-filter: var(--modal-blur);
+}
+
+:root[data-skin] .modal {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--modal-bg);
+  border: var(--modal-border);
+  border-radius: var(--modal-r);
+  box-shadow: var(--modal-shadow);
+}
+
+:root[data-skin] .modal > .modal-head {
+  padding: 16px 20px 12px;
+  background: var(--modal-head-bg);
+  color: var(--modal-head-text);
+  border-bottom: var(--modal-head-border);
+}
+
+:root[data-skin] .modal > .modal-head h2 {
+  font-family: var(--modal-title-font);
+  color: inherit;
+}
+
+:root[data-skin] .modal > .modal-head button.ghost {
+  color: inherit;
+}
+
+:root[data-skin] .modal > .modal-body {
+  padding: 16px 20px 20px;
+}
+
+:root[data-skin] .modal > .modal-foot {
+  padding: 0 20px 20px;
+}

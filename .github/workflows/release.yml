@@ -117,6 +117,8 @@ jobs:
             cuda: true
     env:
       DIST: dist/heretic-${{ needs.version.outputs.version }}-${{ matrix.name }}
+      # Compiled into the GUI so the update check knows the build number of v<version>.<n> builds.
+      HERETIC_BUILD_TAG: ${{ needs.version.outputs.tag }}
 
     steps:
       - uses: actions/checkout@v6

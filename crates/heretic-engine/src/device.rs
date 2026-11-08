@@ -38,7 +38,10 @@ pub fn resolve_device(device_map: &DeviceMap) -> Result<Device> {
 
 fn cuda_device(index: usize) -> Result<Device> {
     if !cuda_compiled() {
-        bail!("This build of Heretic was compiled without CUDA support (enable the \"cuda\" feature)");
+        bail!(
+            "This build of Heretic has no CUDA support. Download the CUDA build (\"cuda12\" in the file name) from \
+             the releases page, or select the CPU device"
+        );
     }
     Ok(Device::new_cuda(index)?)
 }

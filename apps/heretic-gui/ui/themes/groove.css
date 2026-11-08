@@ -1,0 +1,52 @@
+/* Groove: black screen with an accent gradient at the top, large bold type, big card radii,
+   capsule buttons with dark text on the accent. */
+
+:root[data-skin="groove"] {
+  --bar: rgba(18, 18, 18, 0.9);
+  --bar-line: #282828;
+  --on-danger: #000000;
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+  --chip-r: 999px;
+  --page: linear-gradient(color-mix(in srgb, var(--tint) 32%, #121212) 0, #121212 340px), #121212;
+  --hero-size: 36px;
+  --hero-weight: 800;
+  --hero-tracking: -0.03em;
+  --title-weight: 700;
+
+  --sw-thumb: 16px;
+  --sw-pad: 3px;
+  --sw-off: #535353;
+  --sw-shadow: none;
+  --seg-r: 999px;
+  --seg-text: var(--text);
+  --seg-on: var(--text);
+  --seg-on-text: var(--bg);
+
+  --btn-r: 999px;
+  --btn-weight: 700;
+  --btn-border: var(--sep-strong);
+  --btn-color: var(--text);
+
+  --card-border: 0;
+  --card-radius: 8px;
+
+  --side-bg: #000000;
+  --side-border: 0;
+  --side-active-bg: var(--surface-press);
+  --side-active-color: var(--text);
+  --side-active-icon: var(--tint);
+  --side-weight: 700;
+
+  --modal-r: 14px;
+  --modal-head-bg: linear-gradient(180deg, color-mix(in srgb, var(--tint) 14%, var(--bg-elev)), var(--bg-elev));
+}
+
+:root[data-skin="groove"][data-theme="light"] {
+  --bar: rgba(255, 255, 255, 0.9);
+  --bar-line: #ebebeb;
+  --on-danger: #ffffff;
+  --page: linear-gradient(color-mix(in srgb, var(--tint) 28%, #ffffff) 0, #ffffff 340px), #ffffff;
+  --sw-off: #cfcfcf;
+  --side-bg: #f6f6f6;
+  --side-active-icon: color-mix(in srgb, var(--tint) 55%, #000000);
+}

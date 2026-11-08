@@ -1,0 +1,124 @@
+/* Patch: a game client's changelog window. Charcoal bars, graphite work area, muted gray meta,
+   translucent blue "hover-fade" buttons that fill with a gradient on hover, uppercase section
+   titles in the accent, a sidebar with an accent stripe on the selected entry. */
+
+:root[data-skin="patch"] {
+  --bar: #202020;
+  --bar-line: #3a3a3a;
+  --thumb: #e6e6e6;
+  --shadow-soft: rgba(0, 0, 0, 0.48);
+  --chip-r: 2px;
+  --page: linear-gradient(180deg, #262626 0%, var(--bg) 140px);
+  --hero-size: 20px;
+  --hero-weight: 700;
+  --hero-tracking: 0.04em;
+  --hero-transform: uppercase;
+  --hero-color: #ffffff;
+  --title-weight: 700;
+  --title-transform: uppercase;
+  --title-tracking: 0.04em;
+  --title-color: var(--tint-text);
+
+  --sw-r: 2px;
+  --sw-h: 20px;
+  --sw-thumb: 14px;
+  --sw-thumb-r: 1px;
+  --sw-pad: 3px;
+  --sw-off: #202020;
+  --sw-on: color-mix(in srgb, var(--tint) 75%, #000000);
+  --sw-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  --sw-track-shadow: inset 0 0 0 1px var(--sep-strong), inset 0 1px 2px rgba(0, 0, 0, 0.45);
+  --sw-track-shadow-on: inset 0 0 0 1px var(--tint);
+  --thumb-on: #ffffff;
+  --seg-r: 2px;
+  --seg-line: #3d3d3d;
+  --seg-text: #999797;
+  --seg-bg: var(--bar);
+  --seg-pad: 2px;
+  --seg-item-r: 2px;
+  --seg-weight: 600;
+  --seg-on: color-mix(in srgb, var(--tint) 24%, #202020);
+  --seg-on-text: #ffffff;
+  --seg-on-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tint) 55%, transparent);
+
+  --field-line: #3d3d3d;
+  --field-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+  --field-r: 2px;
+
+  --btn-r: 2px;
+  --btn-bg: color-mix(in srgb, var(--tint) 18%, transparent);
+  --btn-border: color-mix(in srgb, var(--tint) 28%, transparent);
+  --btn-color: var(--tint-text);
+  --btn-weight: 600;
+  --btn-hover-bg: linear-gradient(135deg, color-mix(in srgb, var(--tint) 82%, #ffffff) 0%, color-mix(in srgb, var(--tint) 76%, #000000) 100%);
+  --btn-hover-border: var(--tint);
+  --btn-hover-color: var(--on-tint);
+  --btn-hover-shadow: 0 1px 4px var(--shadow-soft);
+  --btn-press-bg: var(--tint-press);
+  --btn-press-border: var(--tint-press);
+  --btn-press-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  --btn-press-move: none;
+  --primary-bg: linear-gradient(135deg, var(--tint) 0%, color-mix(in srgb, var(--tint) 75%, #000000) 100%);
+  --primary-border: color-mix(in srgb, var(--tint) 85%, #ffffff);
+  --primary-shadow: 0 1px 3px var(--shadow-soft);
+  --primary-hover-bg: linear-gradient(135deg, color-mix(in srgb, var(--tint) 86%, #ffffff) 0%, var(--tint) 100%);
+  --danger-bg: color-mix(in srgb, var(--danger) 18%, transparent);
+  --danger-border: color-mix(in srgb, var(--danger) 38%, transparent);
+
+  --card-border: 1px solid var(--sep-strong);
+  --card-radius: 3px;
+  --card-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  --card-hover-bg: color-mix(in srgb, var(--bg-elev) 75%, var(--surface));
+
+  --side-bg: var(--bar);
+  --side-text: var(--text-2);
+  --side-weight: 600;
+  --side-item-r: 2px;
+  --side-hover-bg: color-mix(in srgb, var(--tint) 12%, transparent);
+  --side-active-bg: linear-gradient(90deg, color-mix(in srgb, var(--tint) 24%, transparent) 0%, color-mix(in srgb, var(--tint) 8%, transparent) 100%);
+  --side-active-shadow: inset 3px 0 0 var(--tint);
+  --side-active-color: #ffffff;
+  --side-active-icon: var(--tint);
+
+  --meter-r: 2px;
+  --meter-track: var(--bar);
+  --meter-track-shadow: inset 0 0 0 1px var(--sep-strong), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  --meter-fill: linear-gradient(90deg, color-mix(in srgb, var(--tint) 75%, #000000) 0%, var(--tint) 100%);
+
+  --log-bg: var(--bar);
+  --log-border: 1px solid var(--sep-strong);
+  --th-transform: uppercase;
+  --th-tracking: 0.04em;
+
+  --modal-r: 4px;
+  --modal-bg: var(--bg);
+  --modal-border: 1px solid var(--sep-strong);
+  --modal-shadow: 0 12px 32px rgba(0, 0, 0, 0.65);
+  --modal-head-bg: var(--bar);
+  --modal-head-border: 1px solid var(--bar-line);
+  --overlay: rgba(0, 0, 0, 0.68);
+}
+
+:root[data-skin="patch"][data-theme="light"] {
+  --bar: #dce2e8;
+  --bar-line: #bfc8d1;
+  --thumb: #ffffff;
+  --shadow-soft: rgba(27, 31, 36, 0.14);
+  --page: linear-gradient(180deg, #e1e7ec 0%, var(--bg) 140px);
+  --hero-color: var(--text);
+  --sw-off: #b8c2cc;
+  --sw-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --seg-line: #b8c2cc;
+  --seg-text: #57606a;
+  --seg-on: var(--tint);
+  --seg-on-text: var(--on-tint);
+  --field-line: #b8c2cc;
+  --field-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+  --card-shadow: 0 1px 2px var(--shadow-soft);
+  --side-active-color: var(--tint-text);
+}
+
+:root[data-skin="patch"] .modal > .modal-head h2 {
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}

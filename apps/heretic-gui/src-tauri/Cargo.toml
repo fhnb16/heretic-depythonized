@@ -21,6 +21,7 @@ anyhow = "1"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["float_roundtrip"] }
 ureq = { version = "3", features = ["json"] }
+sha2 = "0.11.1"
 heretic-core = { path = "../../../crates/heretic-core" }
 heretic-engine = { path = "../../../crates/heretic-engine" }
 heretic-optim = { path = "../../../crates/heretic-optim" }

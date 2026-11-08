@@ -88,6 +88,24 @@ Every release contains:
 Versions with a semver suffix (`2.2.0-rc.1`) are published as pre-releases. Pushing a `v*`
 tag by hand or running the workflow manually with "force" rebuilds an existing tag.
 
+### Update check in the desktop application
+
+The GUI checks the GitHub releases of `fhnb16/heretic-depythonized` for a newer build
+(`apps/heretic-gui/src-tauri/src/update.rs`, frontend `ui/js/update.js`):
+
+* On start, at most once every 6 hours (Settings → About: "Check for updates on start"), and
+  on demand with "Check for updates". Pre-releases (`v<version>.<n>`) count only when
+  "Include builds between versions" is on. The workflow compiles the release tag into the
+  binary (`HERETIC_BUILD_TAG`), so a `v2.1.4.3` build knows it is newer than `v2.1.4`; a local
+  build compares its `Cargo.toml` version.
+* A new release shows a quiet notice above the run status. "Update" downloads the file for this
+  build (same OS and CPU/CUDA variant), verifies it against `SHA256SUMS.txt`, then:
+  * Windows, installed with the NSIS installer: starts the new installer and closes the app;
+  * Linux AppImage: replaces the AppImage file and restarts it;
+  * portable zips, tarballs and .deb: opens the release page in the browser.
+* There is no signing key, so the checksum list from the same release is the only integrity
+  check. Unauthenticated GitHub API calls are limited to 60 per hour per address.
+
 ### CUDA builds
 
 candle compiles its CUDA kernels with `nvcc` at build time, so there are no prebuilt
@@ -109,6 +127,8 @@ cargo test --release -p heretic-session --test session -- --ignored   # end-to-e
 cargo test --release -p heretic-engine --test reference -- --ignored  # parity with candle-transformers
 cargo test --release -p heretic-engine --test real_model -- --ignored # real models on CPU
 cargo test --release -p heretic-export --test roundtrip -- --ignored  # export round trip
+cargo test --release -p heretic-export --test gguf -- --ignored       # GGUF export (+ quantization
+                                                                      # if HERETIC_TEST_LLAMA_CPP is set)
 ```
 
 ```powershell
@@ -119,9 +139,52 @@ The ignored tests download models and datasets from the Hugging Face Hub.
 
 ## Supported architectures
 
-Currently `llama`, `mistral`, `qwen2` and `qwen3` (including multimodal checkpoints whose
-text model uses one of these architectures). More families (Gemma, MoE models, hybrids) are
-planned.
+| Family | `model_type` (text model) | Notes |
+| :--- | :--- | :--- |
+| Llama 2/3, Mistral | `llama`, `mistral` | |
+| Qwen2/2.5, Qwen3 | `qwen2`, `qwen3` | |
+| Qwen3.5 (dense) | `qwen3_5_text` | Hybrid Gated DeltaNet + gated attention; `linear_attn.out_proj` counts as `attn.o_proj` |
+| Gemma, Gemma 2, Gemma 3 | `gemma`, `gemma2`, `gemma3_text` | Softcapping, sliding windows, local/global RoPE |
+| Gemma 4 (dense) | `gemma4_text` | Per-layer embeddings, shared KV layers, proportional RoPE, `attention_k_eq_v` |
+
+Multimodal checkpoints work when their text model is one of these; only the text model is
+loaded and modified, the other weights are copied unchanged on export. Mixture-of-experts
+models (Qwen3-MoE, Qwen3.5-MoE, Mixtral, gpt-oss, Gemma 4 MoE) and Gemma 3n are not supported
+yet; loading them fails with an explanation.
+
+Models must be in Transformers format (`config.json` + `*.safetensors`); GGUF files can't be
+used as input. Smoke tests for every family (loading, padding invariance, cached generation):
+
+```sh
+cargo test --release -p heretic-engine --test architectures -- --ignored --nocapture
+HERETIC_ARCH_MODELS=Qwen/Qwen3.5-0.8B,unsloth/gemma-3-1b-it cargo test --release -p heretic-engine --test architectures -- --ignored --nocapture
+```
+
+## GGUF export and llama.cpp
+
+Modified models can be saved as a single GGUF file for llama.cpp, LM Studio or Ollama
+(CLI: "Save the model as GGUF", `model_action = "gguf"`; GUI: Save, "GGUF for llama.cpp").
+
+* The conversion to GGUF is done by Heretic itself, in Rust (`crates/heretic-export/src/gguf`):
+  a port of llama.cpp's `convert_hf_to_gguf.py` for the supported architectures — the same
+  tensor names, transformations (Llama Q/K permutation, Gemma/Qwen3.5 norm offsets, Qwen3.5
+  `A_log`, conv and V-head reordering), metadata keys and tokenizer metadata. The BPE
+  pre-tokenizer is detected with the same hash table as upstream
+  (`gguf/pre_tokenizer.rs`, generated from `get_vocab_base_pre`; regenerate it when llama.cpp
+  adds tokenizers). F16 and BF16 files need nothing else.
+* Quantized types (Q8_0, Q6_K, Q5_K_M, Q5_K_S, Q4_K_M, Q4_K_S, Q4_0, Q3_K_M, Q2_K) are made by
+  `llama-quantize` from a llama.cpp build you download from
+  <https://github.com/ggml-org/llama.cpp/releases> (any CPU build is enough). Point Heretic at
+  the unpacked folder with `llama_cpp_dir` (`--llama-cpp-dir`, `HERETIC_LLAMA_CPP_DIR`, or
+  Settings → llama.cpp in the GUI). Heretic writes an unquantized BF16/F16 GGUF next to the
+  output, runs `llama-quantize <in> <out> <TYPE> <threads>` and deletes the intermediate file.
+* `gguf_type` selects the type non-interactively; the output is a folder (the file is named
+  `<model>-heretic-<TYPE>.gguf`) or a path ending in `.gguf`.
+* Supported for GGUF export: Llama 2/3 and Mistral (`llama`), Qwen2/2.5 (`qwen2`), Qwen3
+  (`qwen3`), Qwen3.5 dense (`qwen35`, without the MTP head), Gemma 2 and Gemma 3 (text model).
+  Tokenizers: BPE from `tokenizer.json` known to llama.cpp, SentencePiece `tokenizer.model`, and
+  Llama-style byte-fallback BPE. Gemma 4, mixture-of-experts models and vision towers are not
+  exported to GGUF yet.
 
 ## Differences from Heretic 2.x (Python)
 

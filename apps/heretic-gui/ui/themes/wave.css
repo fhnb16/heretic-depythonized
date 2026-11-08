@@ -1,0 +1,44 @@
+/* Wave: gray backdrop, white radius-12 blocks without separators between them, blue filled
+   buttons, calm type. */
+
+:root[data-skin="wave"] {
+  --bar: #ffffff;
+  --bar-line: #e7e8ec;
+  --shadow-soft: rgba(0, 0, 0, 0.06);
+  --chip-r: 8px;
+  --hero-size: 28px;
+  --hero-weight: 600;
+
+  --sw-w: 44px;
+  --sw-h: 24px;
+  --sw-r: 12px;
+  --sw-thumb: 20px;
+  --sw-off: #d7d8d9;
+  --sw-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  --seg-r: 8px;
+  --seg-on: var(--surface-press);
+  --seg-on-text: var(--text);
+
+  --btn-r: 8px;
+  --btn-bg: color-mix(in srgb, var(--tint) 10%, var(--surface));
+  --btn-border: transparent;
+  --btn-hover-bg: color-mix(in srgb, var(--tint) 16%, var(--surface));
+  --btn-press-move: none;
+
+  --card-border: 0;
+  --card-radius: 12px;
+  --card-shadow: 0 1px 0 var(--shadow-soft);
+
+  --side-item-r: 8px;
+  --side-active-bg: var(--surface-press);
+  --side-active-color: var(--text);
+
+  --modal-r: 22px;
+}
+
+:root[data-skin="wave"][data-theme="dark"] {
+  --bar: #222222;
+  --bar-line: #363738;
+  --sw-off: #555555;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+}

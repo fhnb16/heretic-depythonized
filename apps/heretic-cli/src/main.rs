@@ -408,6 +408,7 @@ fn action_menu(session: &mut Session, reporter: &SharedReporter) -> Result<bool>
         #[derive(Clone, Copy, PartialEq)]
         enum Action {
             Save,
+            Gguf,
             Upload,
             Chat,
             Benchmark,
@@ -416,10 +417,11 @@ fn action_menu(session: &mut Session, reporter: &SharedReporter) -> Result<bool>
 
         let action = match predefined.as_deref() {
             Some("save") => Action::Save,
+            Some("gguf") => Action::Gguf,
             Some("upload") => Action::Upload,
             Some(other) => {
                 return Err(anyhow!(
-                    "Unknown model_action \"{other}\" (expected \"save\" or \"upload\")"
+                    "Unknown model_action \"{other}\" (expected \"save\", \"gguf\" or \"upload\")"
                 ));
             }
             None => {
@@ -429,6 +431,7 @@ fn action_menu(session: &mut Session, reporter: &SharedReporter) -> Result<bool>
                     &format!("What do you want to do with the {kind} model?"),
                     vec![
                         choice("Save the model to a local folder", Action::Save),
+                        choice("Save the model as GGUF (llama.cpp, optionally quantized)", Action::Gguf),
                         choice("Upload the model to Hugging Face", Action::Upload),
                         choice("Chat with the model", Action::Chat),
                         choice("Benchmark the model", Action::Benchmark),
@@ -443,6 +446,7 @@ fn action_menu(session: &mut Session, reporter: &SharedReporter) -> Result<bool>
         let result = match action {
             Action::Back => return Ok(false),
             Action::Save => save_action(session, reporter),
+            Action::Gguf => gguf_action(session, reporter),
             Action::Upload => upload_action(session, reporter),
             Action::Chat => chat_action(session),
             Action::Benchmark => Err(anyhow!("Benchmarks are not available in this version of Heretic yet")),
@@ -484,6 +488,88 @@ fn save_action(session: &mut Session, reporter: &SharedReporter) -> Result<()> {
     };
     session.save_model(&PathBuf::from(&directory), strategy)?;
     reporter.success(format!("Model saved to {directory}."));
+    Ok(())
+}
+
+fn gguf_action(session: &mut Session, reporter: &SharedReporter) -> Result<()> {
+    use heretic_export::gguf::{GgufType, LLAMA_CPP_RELEASES, LlamaCpp};
+
+    let kind = match session.settings.gguf_type.as_deref() {
+        Some(text) => GgufType::parse(text)?,
+        None => {
+            let choices = GgufType::ALL
+                .iter()
+                .map(|t| choice(format!("{:<7} {}", t.name(), t.description()), *t))
+                .collect();
+            let start = GgufType::ALL.iter().position(|t| *t == GgufType::Q4_K_M).unwrap_or(0);
+            match ask(Select::new("Which GGUF type do you want?", choices)
+                .with_page_size(15)
+                .with_starting_cursor(start)
+                .prompt())?
+            {
+                Some(choice) => choice.value,
+                None => return Ok(()),
+            }
+        }
+    };
+
+    // Quantized types need llama-quantize from a llama.cpp build.
+    let mut llama_cpp_dir = session.settings.llama_cpp_dir.clone();
+    if kind.needs_quantize() {
+        loop {
+            let dir = match llama_cpp_dir.clone() {
+                Some(dir) => dir,
+                None => {
+                    println!(
+                        "{} needs llama-quantize from llama.cpp. Download a release for your system from {} and \
+                         unpack it (set {} to skip this question).",
+                        kind.name(),
+                        style(LLAMA_CPP_RELEASES).blue().underlined(),
+                        style("--llama-cpp-dir").bold()
+                    );
+                    match ask(Text::new("Path to the llama.cpp folder:").prompt())? {
+                        Some(dir) if !dir.trim().is_empty() => dir.trim().to_string(),
+                        _ => return Ok(()),
+                    }
+                }
+            };
+            match LlamaCpp::locate(std::path::Path::new(&dir)).and_then(|l| l.check().map(|_| l)) {
+                Ok(llama_cpp) => {
+                    reporter.info(format!(
+                        "Using llama.cpp from **{}**{}",
+                        llama_cpp.directory.display(),
+                        llama_cpp.version.map(|v| format!(" (version {v})")).unwrap_or_default()
+                    ));
+                    llama_cpp_dir = Some(dir);
+                    break;
+                }
+                Err(error) if session.settings.llama_cpp_dir.is_none() => {
+                    println!("{} {}", style("Error:").red(), style(format!("{error:#}")).red());
+                    llama_cpp_dir = None;
+                }
+                Err(error) => return Err(error),
+            }
+        }
+    }
+
+    let directory = match session.settings.save_directory.clone() {
+        Some(directory) => directory,
+        None => match ask(Text::new("Path to the folder (or .gguf file):").prompt())? {
+            Some(directory) if !directory.trim().is_empty() => directory.trim().to_string(),
+            _ => return Ok(()),
+        },
+    };
+
+    let export = session.save_gguf(
+        &PathBuf::from(&directory),
+        kind,
+        llama_cpp_dir.as_deref().map(std::path::Path::new),
+    )?;
+    reporter.success(format!(
+        "Model saved to {} ({:.2} GB).",
+        export.path.display(),
+        export.bytes as f64 / 1e9
+    ));
     Ok(())
 }
 

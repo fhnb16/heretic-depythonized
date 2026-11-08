@@ -1,0 +1,149 @@
+/* Alloy: a 2010s game launcher. Platinum chrome, 2px frames, charcoal "decorated" buttons with
+   a double white bevel and a golden click, glossy accent progress bars. */
+
+:root[data-skin="alloy"] {
+  --bar: #e7e8ea;
+  --bar-line: #b1b3b4;
+  --shadow-soft: rgba(0, 0, 0, 0.18);
+  --chip-r: 4px;
+  --page: radial-gradient(circle at 50% 0%, #eceef1 0%, #cfd2d6 100%);
+  --hero-size: 24px;
+  --hero-weight: 700;
+  --title-weight: 700;
+  --title-transform: uppercase;
+  --title-tracking: 0.08em;
+  --title-color: var(--text-2);
+
+  --sw-w: 42px;
+  --sw-off: #b5b7ba;
+  --sw-on: linear-gradient(180deg, color-mix(in srgb, var(--tint) 55%, #ffffff) 0%, color-mix(in srgb, var(--tint) 85%, #ffffff) 50%, var(--tint) 80%);
+  --sw-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --sw-track-shadow-on: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  --seg-r: 6px;
+  --seg-line: #b1b3b4;
+  --seg-text: #434345;
+  --seg-bg: #d4d6da;
+  --seg-pad: 2px;
+  --seg-item-r: 4px;
+  --seg-weight: 700;
+  --seg-on: linear-gradient(180deg, #ffffff 0%, #e7e8ea 100%);
+  --seg-on-text: #1a1a1a;
+  --seg-on-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 0 #ffffff;
+
+  --field-line: #b9babc;
+  --field-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.12);
+
+  --btn-r: 6px;
+  --btn-bw: 2px;
+  --btn-bg: linear-gradient(180deg, #646567 0%, #242425 100%);
+  --btn-border: #ffffff;
+  --btn-color: #ffffff;
+  --btn-shadow: 0 0 0 1px #57585a;
+  --btn-text-shadow: 0 -1px 1px #000000;
+  --btn-weight: 700;
+  --btn-hover-bg: linear-gradient(180deg, #c7c8ca 0%, #656668 90%);
+  --btn-hover-color: #ffffff;
+  --btn-press-bg: linear-gradient(180deg, #646567 0%, #242425 100%);
+  --btn-press-color: #ffffff;
+  --btn-press-border: var(--tint);
+  --btn-press-shadow: 0 0 0 1px var(--tint-press), inset 0 2px 4px rgba(0, 0, 0, 0.4);
+  --btn-press-move: none;
+  --primary-bg: var(--btn-bg);
+  --primary-border: #ffffff;
+  --primary-color: var(--tint);
+  --primary-shadow: 0 0 0 1px #57585a, 0 2px 6px rgba(0, 0, 0, 0.25);
+  --primary-text-shadow: 0 -1px 2px #000000;
+  --primary-hover-bg: var(--btn-hover-bg);
+  --primary-hover-color: #ffffff;
+  --primary-press-bg: var(--btn-bg);
+  --danger-bg: linear-gradient(180deg, #ab1f1f 0%, #570a0a 100%);
+  --danger-border: #ffffff;
+  --danger-color: #ffffff;
+
+  --card-border: 2px solid var(--sep-strong);
+  --card-radius: 7px;
+  --card-shadow: 0 1px 3px var(--shadow-soft);
+
+  /* Launcher sidebar: chrome panel, the selected item is a dark plate. */
+  --side-bg: var(--bg-elev);
+  --side-border: 2px solid var(--bar-line);
+  --side-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.6);
+  --side-text: #555557;
+  --side-weight: 700;
+  --side-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  --side-item-r: 4px;
+  --side-hover-bg: #dcdfe3;
+  --side-hover-color: #1a1a1a;
+  --side-active-bg: #404043;
+  --side-active-color: #ffffff;
+  --side-active-icon: var(--tint);
+  --side-active-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 2px rgba(0, 0, 0, 0.2);
+
+  --meter-h: 10px;
+  --meter-r: 4px;
+  --meter-track: #18181a;
+  --meter-track-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--sep-strong);
+  --meter-fill: linear-gradient(180deg, color-mix(in srgb, var(--tint) 55%, #ffffff) 0%, color-mix(in srgb, var(--tint) 85%, #ffffff) 50%, var(--tint) 80%);
+  --meter-fill-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  --modal-r: 7px;
+  --modal-head-bg: linear-gradient(180deg, #f4f5f6 0%, #e7e8ea 100%);
+  --modal-head-text: #202022;
+  --modal-head-border: 1px solid var(--bar-line);
+  --modal-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --th-transform: uppercase;
+  --th-tracking: 0.08em;
+}
+
+:root[data-skin="alloy"][data-theme="dark"] {
+  --bar: #1c1c1e;
+  --bar-line: #3c3c3e;
+  --shadow-soft: rgba(0, 0, 0, 0.6);
+  --page: radial-gradient(circle at 50% 10%, #1e1e24 0%, #0d0e10 100%);
+  --sw-off: #434346;
+  --seg-line: #3c3c3e;
+  --seg-text: #a7a9ac;
+  --seg-bg: #252528;
+  --seg-on: linear-gradient(180deg, #48484c 0%, #2e2e32 100%);
+  --seg-on-text: #ffffff;
+  --seg-on-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --field-line: #48484c;
+  --field-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.35);
+  --side-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.05);
+  --side-text: #a7a9ac;
+  --side-text-shadow: none;
+  --side-hover-bg: #28282c;
+  --side-hover-color: #ffffff;
+  --side-active-bg: #343438;
+  --modal-head-bg: linear-gradient(180deg, #26262a 0%, #1c1c1e 100%);
+  --modal-head-text: #f0f0f2;
+}
+
+:root[data-skin="alloy"] .nav.active {
+  text-shadow: 0 -1px 1px #000000;
+}
+
+:root[data-skin="alloy"] button.ghost:not(.icon-only) {
+  border: 1px dashed var(--sep-strong);
+}
+
+:root[data-skin="alloy"] button:disabled:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button) {
+  background: #9d9ea0;
+  box-shadow: 0 0 0 1px #77787a;
+  color: #545559;
+  text-shadow: none;
+  opacity: 1;
+}
+
+:root[data-skin="alloy"] button.card:hover:not(:disabled) {
+  border-color: #7b7c7e;
+}
+
+:root[data-skin="alloy"] .modal > .modal-head {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+:root[data-skin="alloy"][data-theme="dark"] .modal > .modal-head {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}

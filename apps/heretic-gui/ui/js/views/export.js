@@ -1,14 +1,26 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Export dialog: save locally or upload to Hugging Face.
 
-import { api } from "../api.js";
+import { api, formatBytes } from "../api.js";
 import { h, progressBar, replace } from "../dom.js";
 import { state, subscribe, t } from "../store.js";
 import { openDialog } from "../tauri.js";
 import { modal } from "../components/widgets.js";
+import { DEFAULT_GGUF_TYPE, GGUF_TYPES, getLlamaCppDir, needsLlamaCpp } from "../llamacpp.js";
 
 export function openExport(mode) {
-  const local = { tab: mode, strategy: "merge", user: null, card: null, working: false };
+  const local = { tab: mode, strategy: "merge", ggufType: DEFAULT_GGUF_TYPE, user: null, card: null, working: false };
+  const llamaCppDir = getLlamaCppDir();
+  const ggufSelect = h(
+    "select",
+    { "aria-label": t("exportGgufType") },
+    GGUF_TYPES.map((type) => h("option", { value: type.id }, `${type.id} · ${t(type.hint)}`)),
+  );
+  ggufSelect.value = local.ggufType;
+  ggufSelect.addEventListener("change", () => {
+    local.ggufType = ggufSelect.value;
+    render();
+  });
   const modelName = (state.settings?.model ?? "model").split(/[\\/]/).pop();
 
   const tabs = h("div", { class: "segmented" });
@@ -85,6 +97,8 @@ export function openExport(mode) {
             class: local.tab === tab ? "active" : "",
             onclick: () => {
               local.tab = tab;
+              // GGUF files are saved locally only.
+              if (tab === "hub" && local.strategy === "gguf") local.strategy = "merge";
               render();
               if (tab === "hub" && !local.user) checkUser(true);
             },
@@ -99,6 +113,7 @@ export function openExport(mode) {
       [
         ["merge", "exportMerge", "exportMergeHint"],
         ["adapter", "exportAdapter", "exportAdapterHint"],
+        ...(local.tab === "local" ? [["gguf", "exportGguf", "exportGgufHint"]] : []),
       ].map(([value, title, hint]) =>
         h(
           "button",
@@ -116,6 +131,8 @@ export function openExport(mode) {
     );
 
     if (local.tab === "local") {
+      const gguf = local.strategy === "gguf";
+      const missingLlama = gguf && needsLlamaCpp(local.ggufType) && !llamaCppDir;
       replace(
         content,
         h(
@@ -137,7 +154,13 @@ export function openExport(mode) {
               t("exportChoose"),
             ),
           ),
+          gguf ? h("span", { class: "hint" }, t("exportGgufFolderHint")) : null,
         ),
+        gguf ? h("label", { class: "field" }, t("exportGgufType"), ggufSelect) : null,
+        gguf && needsLlamaCpp(local.ggufType) && llamaCppDir
+          ? h("span", { class: "muted small mono ellipsis" }, t("exportGgufLlama", { path: llamaCppDir }))
+          : null,
+        missingLlama ? h("div", { class: "error-box" }, t("exportGgufNeedsLlama")) : null,
       );
     } else {
       replace(
@@ -165,9 +188,16 @@ export function openExport(mode) {
             "button",
             {
               class: "primary",
-              disabled: local.working,
+              disabled: local.working || (local.strategy === "gguf" && needsLlamaCpp(local.ggufType) && !llamaCppDir),
               onclick: () => {
                 if (!directory.value.trim()) return;
+                if (local.strategy === "gguf") {
+                  run(
+                    () => api.saveGguf(directory.value.trim(), local.ggufType, llamaCppDir || null),
+                    (result) => t("exportGgufSaved", { path: result.path, size: formatBytes(result.bytes) }),
+                  );
+                  return;
+                }
                 run(
                   () => api.saveModel(directory.value.trim(), local.strategy),
                   (result) => t("exportSaved", { path: result.directory }),

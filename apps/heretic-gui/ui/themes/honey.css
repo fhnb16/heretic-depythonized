@@ -1,0 +1,48 @@
+/* Honey: warm light background, large soft radii, yellow fill with black text, firm headings. */
+
+:root[data-skin="honey"] {
+  --bar: #ffffff;
+  --bar-line: #eeeeee;
+  --shadow-soft: rgba(0, 0, 0, 0.06);
+  --chip-r: 12px;
+  --hero-size: 32px;
+  --hero-weight: 700;
+  --hero-tracking: -0.02em;
+  --title-weight: 700;
+
+  --sw-w: 44px;
+  --sw-h: 24px;
+  --sw-r: 12px;
+  --sw-thumb: 20px;
+  --sw-off: #e0ded9;
+  --sw-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  --seg-r: 12px;
+  --seg-text: var(--text);
+
+  --btn-r: 12px;
+  --btn-border: var(--sep-strong);
+  --btn-color: var(--text);
+  --btn-hover-bg: var(--surface-press);
+
+  --card-border: 0;
+  --card-radius: 16px;
+  --card-shadow: 0 2px 10px var(--shadow-soft);
+
+  --side-item-r: 12px;
+  --side-active-bg: var(--tint);
+  --side-active-color: var(--on-tint);
+  --side-active-icon: var(--on-tint);
+
+  --meter-h: 8px;
+  --meter-r: 4px;
+
+  --modal-r: 20px;
+  --modal-head-bg: color-mix(in srgb, var(--companion) 16%, var(--bg-elev));
+}
+
+:root[data-skin="honey"][data-theme="dark"] {
+  --bar: #1f1f1f;
+  --bar-line: #2a2a2a;
+  --sw-off: #3a3a3a;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+}

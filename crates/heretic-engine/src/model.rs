@@ -89,7 +89,9 @@ impl Model {
         let tokenizer = ModelTokenizer::from_repo(&repo)?;
         if !tokenizer.has_chat_template() {
             bail!(
-                "{} has no chat template; Heretic requires an instruction-tuned model",
+                "{} has no chat template (no chat_template.jinja and no \"chat_template\" in tokenizer_config.json). \
+                 Heretic requires an instruction-tuned model, usually named \"-Instruct\" or \"-it\"; base models \
+                 can't be used",
                 settings.model
             );
         }
@@ -155,6 +157,33 @@ impl Model {
                         reporter.info(format!("* Resolved to **{}**", dtype_name(model.dtype)));
                     }
                     reporter.info(format!("* Transformer model with **{}** layers", model.num_layers()));
+                    let config = model.config();
+                    let linear = config
+                        .layers
+                        .iter()
+                        .filter(|l| l.kind == crate::config::LayerKind::LinearAttention)
+                        .count();
+                    let sliding = config.layers.iter().filter(|l| l.sliding_window.is_some()).count();
+                    let mut layout = Vec::new();
+                    if linear > 0 {
+                        layout.push(format!("{linear} linear attention"));
+                    }
+                    if sliding > 0 {
+                        layout.push(format!("{sliding} sliding window"));
+                    }
+                    let full = config.num_hidden_layers - linear - sliding;
+                    if !layout.is_empty() {
+                        layout.push(format!("{full} full attention"));
+                    }
+                    reporter.info(format!(
+                        "* Architecture: **{}**{}",
+                        config.model_type,
+                        if layout.is_empty() {
+                            String::new()
+                        } else {
+                            format!(" ({})", layout.join(", "))
+                        }
+                    ));
                     reporter.info("* Modifiable components:");
                     for (component, count) in model.component_counts() {
                         reporter.info(format!("  * **{component}**: **{count}** modules total"));
@@ -169,8 +198,26 @@ impl Model {
             }
         }
 
+        let joined = errors.join("\n").to_lowercase();
+        let weights_gb = weight_files
+            .iter()
+            .filter_map(|f| std::fs::metadata(f).ok())
+            .map(|m| m.len())
+            .sum::<u64>() as f64
+            / 1e9;
+        let hint = if joined.contains("out of memory") || joined.contains("out_of_memory") || joined.contains("alloc") {
+            format!(
+                "\n\nNot enough memory on {}: the weights alone take {weights_gb:.1} GB, plus activations. Close other \
+                 programs that use the GPU, choose a smaller model, lower batch_size, or select the CPU device.",
+                device_name(&device)
+            )
+        } else if joined.contains("non-finite logits") {
+            "\n\nThe model overflows in half precision. Add \"float32\" to dtypes (needs twice the memory).".to_string()
+        } else {
+            String::new()
+        };
         bail!(
-            "Failed to load model with all configured dtypes:\n{}",
+            "Failed to load model with all configured dtypes:\n{}{hint}",
             errors.join("\n")
         )
     }

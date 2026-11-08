@@ -4,6 +4,7 @@
 //! Exporting modified models: merged safetensors checkpoints (streamed tensor by
 //! tensor, so memory use doesn't grow with model size) and PEFT LoRA adapters.
 
+pub mod gguf;
 pub mod hub_upload;
 pub mod model_card;
 pub mod safetensors_writer;
@@ -102,12 +103,125 @@ pub fn file_sha256(path: &Path) -> Result<String> {
     Ok(hasher.finalize().iter().map(|b| format!("{b:02x}")).collect())
 }
 
-struct SourceTensor {
+struct CheckpointTensor {
     name: String,
     file: usize,
     dtype: Dtype,
     shape: Vec<usize>,
     offset: usize,
+}
+
+/// The tensors of a model's checkpoint with the LoRA adapters merged into the modified
+/// weights, read one at a time from the memory-mapped source files.
+///
+/// Like PEFT's `merge_and_unload`, modified weights become `W + (B @ A)` computed in the
+/// model's dtype, and all floating point tensors are produced in the dtype the model was
+/// loaded with.
+pub struct MergedTensors<'a> {
+    model: &'a Model,
+    maps: Vec<memmap2::Mmap>,
+    sources: Vec<CheckpointTensor>,
+    modules: HashMap<String, Arc<LoraLinear>>,
+    tensors: Vec<gguf::SourceTensor>,
+}
+
+impl<'a> MergedTensors<'a> {
+    pub fn open(model: &'a Model) -> Result<MergedTensors<'a>> {
+        let target_dtype = candle_to_safetensors_dtype(model.dtype)?;
+
+        let modules: HashMap<String, Arc<LoraLinear>> = model
+            .all_modules()
+            .into_iter()
+            .map(|module| (format!("{}.weight", module.name), module))
+            .collect();
+
+        // Map the source files and collect their tensors in file order.
+        let mut maps = Vec::new();
+        for path in &model.weight_files {
+            let file = std::fs::File::open(path).with_context(|| format!("Failed to open {}", path.display()))?;
+            // SAFETY: The source files are not modified while mapped.
+            let map = unsafe { memmap2::Mmap::map(&file)? };
+            maps.push(map);
+        }
+
+        let mut sources = Vec::new();
+        for (index, map) in maps.iter().enumerate() {
+            let (_, metadata) = safetensors::SafeTensors::read_metadata(map)
+                .map_err(|e| anyhow!("Invalid safetensors file {}: {e}", model.weight_files[index].display()))?;
+            let mut entries: Vec<CheckpointTensor> = metadata
+                .tensors()
+                .into_iter()
+                .map(|(name, info)| CheckpointTensor {
+                    name: name.clone(),
+                    file: index,
+                    dtype: info.dtype,
+                    shape: info.shape.clone(),
+                    offset: info.data_offsets.0,
+                })
+                .collect();
+            entries.sort_by_key(|e| e.offset);
+            sources.extend(entries);
+        }
+
+        let tensors = sources
+            .iter()
+            .map(|source| gguf::SourceTensor {
+                name: source.name.clone(),
+                dtype: if is_float(source.dtype) {
+                    target_dtype
+                } else {
+                    source.dtype
+                },
+                shape: source.shape.clone(),
+            })
+            .collect();
+
+        Ok(MergedTensors {
+            model,
+            maps,
+            sources,
+            modules,
+            tensors,
+        })
+    }
+
+    /// Number of modules whose weights change.
+    pub fn modified_count(&self) -> usize {
+        self.modules.values().filter(|m| m.has_adapter()).count()
+    }
+}
+
+impl gguf::TensorSource for MergedTensors<'_> {
+    fn tensors(&self) -> &[gguf::SourceTensor] {
+        &self.tensors
+    }
+
+    fn read(&self, index: usize) -> Result<Vec<u8>> {
+        let source = &self.sources[index];
+        let raw = safetensors::SafeTensors::deserialize(&self.maps[source.file])
+            .map_err(|e| anyhow!("{e}"))?
+            .tensor(&source.name)
+            .map_err(|e| anyhow!("{e}"))?
+            .data()
+            .to_vec();
+
+        if let Some(module) = self.modules.get(&source.name)
+            && let Some(adapter) = module.adapter()
+        {
+            // PEFT: delta = B @ A, cast to the weight dtype, added in that dtype.
+            let delta = adapter.b.matmul(&adapter.a)?.to_dtype(self.model.dtype)?;
+            let merged = (module.weight() + delta)?;
+            return tensor_bytes(&merged);
+        }
+
+        let out_dtype = self.tensors[index].dtype;
+        if out_dtype == source.dtype {
+            return Ok(raw);
+        }
+        let source_dtype = safetensors_to_candle_dtype(source.dtype).ok_or_else(|| anyhow!("Unsupported dtype"))?;
+        let tensor = Tensor::from_raw_buffer(&raw, source_dtype, &source.shape, &Device::Cpu)?;
+        tensor_bytes(&tensor.to_dtype(self.model.dtype)?)
+    }
 }
 
 /// Result of saving a model.
@@ -176,54 +290,10 @@ fn set_dtype_recursive(config: &mut Value, dtype: &str) {
 pub fn save_merged(model: &Model, dir: &Path, max_shard_size: u64, reporter: &SharedReporter) -> Result<SavedModel> {
     std::fs::create_dir_all(dir).with_context(|| format!("Failed to create {}", dir.display()))?;
 
-    let target_dtype = candle_to_safetensors_dtype(model.dtype)?;
-
-    let modules: HashMap<String, Arc<LoraLinear>> = model
-        .all_modules()
-        .into_iter()
-        .map(|module| (format!("{}.weight", module.name), module))
-        .collect();
-
-    // Map the source files and collect their tensors in file order.
-    let mut maps = Vec::new();
-    for path in &model.weight_files {
-        let file = std::fs::File::open(path).with_context(|| format!("Failed to open {}", path.display()))?;
-        // SAFETY: The source files are not modified while mapped.
-        let map = unsafe { memmap2::Mmap::map(&file)? };
-        maps.push(map);
-    }
-
-    let mut sources = Vec::new();
-    for (index, map) in maps.iter().enumerate() {
-        let tensors = safetensors::SafeTensors::deserialize(map)
-            .map_err(|e| anyhow!("Invalid safetensors file {}: {e}", model.weight_files[index].display()))?;
-        let (_, metadata) = safetensors::SafeTensors::read_metadata(map).map_err(|e| anyhow!("{e}"))?;
-        let mut entries: Vec<SourceTensor> = metadata
-            .tensors()
-            .into_iter()
-            .map(|(name, info)| SourceTensor {
-                name: name.clone(),
-                file: index,
-                dtype: info.dtype,
-                shape: info.shape.clone(),
-                offset: info.data_offsets.0,
-            })
-            .collect();
-        entries.sort_by_key(|e| e.offset);
-        drop(tensors);
-        sources.extend(entries);
-    }
-
-    let output_dtype = |source: &SourceTensor| {
-        if is_float(source.dtype) {
-            target_dtype
-        } else {
-            source.dtype
-        }
-    };
-    let byte_size = |source: &SourceTensor| -> usize {
-        source.shape.iter().product::<usize>() * output_dtype(source).bitsize() / 8
-    };
+    let merged = MergedTensors::open(model)?;
+    let sources = gguf::TensorSource::tensors(&merged);
+    let byte_size =
+        |source: &gguf::SourceTensor| -> usize { source.shape.iter().product::<usize>() * source.dtype.bitsize() / 8 };
 
     // Split into shards greedily in checkpoint order, like huggingface_hub does.
     let mut shards: Vec<Vec<usize>> = vec![Vec::new()];
@@ -250,7 +320,7 @@ pub fn save_merged(model: &Model, dir: &Path, max_shard_size: u64, reporter: &Sh
     let mut weight_map = BTreeMap::new();
     let mut total_size = 0u64;
     let mut weight_files = Vec::new();
-    let merged_count = modules.values().filter(|m| m.has_adapter()).count();
+    let merged_count = merged.modified_count();
     reporter.info(format!(
         "* Writing **{}** tensors in **{shard_count}** file(s) (**{merged_count}** modified)...",
         sources.len()
@@ -264,38 +334,13 @@ pub fn save_merged(model: &Model, dir: &Path, max_shard_size: u64, reporter: &Sh
                 let source = &sources[i];
                 PlannedTensor {
                     name: source.name.clone(),
-                    dtype: output_dtype(source),
+                    dtype: source.dtype,
                     shape: source.shape.clone(),
                 }
             })
             .collect();
 
-        let produce = |position: usize| -> Result<Vec<u8>> {
-            let source = &sources[shard[position]];
-            let raw = safetensors::SafeTensors::deserialize(&maps[source.file])
-                .map_err(|e| anyhow!("{e}"))?
-                .tensor(&source.name)
-                .map_err(|e| anyhow!("{e}"))?
-                .data()
-                .to_vec();
-
-            if let Some(module) = modules.get(&source.name)
-                && let Some(adapter) = module.adapter()
-            {
-                // PEFT: delta = B @ A, cast to the weight dtype, added in that dtype.
-                let delta = adapter.b.matmul(&adapter.a)?.to_dtype(model.dtype)?;
-                let merged = (module.weight() + delta)?;
-                return tensor_bytes(&merged);
-            }
-
-            let out_dtype = output_dtype(source);
-            if out_dtype == source.dtype {
-                return Ok(raw);
-            }
-            let source_dtype = safetensors_to_candle_dtype(source.dtype).ok_or_else(|| anyhow!("Unsupported dtype"))?;
-            let tensor = Tensor::from_raw_buffer(&raw, source_dtype, &source.shape, &Device::Cpu)?;
-            tensor_bytes(&tensor.to_dtype(model.dtype)?)
-        };
+        let produce = |position: usize| -> Result<Vec<u8>> { gguf::TensorSource::read(&merged, shard[position]) };
 
         let path = dir.join(&file_name);
         reporter.progress(

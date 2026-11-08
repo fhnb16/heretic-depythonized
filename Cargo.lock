@@ -2207,7 +2207,7 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "heretic"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "console",
@@ -2225,7 +2225,7 @@ dependencies = [
 
 [[package]]
 name = "heretic-core"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2251,7 +2251,7 @@ dependencies = [
 
 [[package]]
 name = "heretic-engine"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "candle-core",
@@ -2270,7 +2270,7 @@ dependencies = [
 
 [[package]]
 name = "heretic-export"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "base64 0.23.1",
@@ -2284,13 +2284,14 @@ dependencies = [
  "serde_json",
  "sha2 0.11.1",
  "tempfile",
+ "tokenizers",
  "ureq 3.5.1",
  "yaml-rust2",
 ]
 
 [[package]]
 name = "heretic-gui"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "heretic-core",
@@ -2301,6 +2302,7 @@ dependencies = [
  "heretic-session",
  "serde",
  "serde_json",
+ "sha2 0.11.1",
  "tauri",
  "tauri-build",
  "tauri-plugin-dialog",
@@ -2309,7 +2311,7 @@ dependencies = [
 
 [[package]]
 name = "heretic-optim"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "candle-core",
@@ -2324,7 +2326,7 @@ dependencies = [
 
 [[package]]
 name = "heretic-plugins"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "candle-core",
@@ -2341,7 +2343,7 @@ dependencies = [
 
 [[package]]
 name = "heretic-session"
-version = "2.1.4"
+version = "2.2.0"
 dependencies = [
  "anyhow",
  "heretic-core",

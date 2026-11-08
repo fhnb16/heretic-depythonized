@@ -1,0 +1,80 @@
+/* Fluent 2: radius 4 rectangles with a slightly darker bottom edge, the main action filled with the
+   accent; navigation selection as a light plate with a vertical accent bar; capsule switch. */
+
+:root[data-skin="fluent"] {
+  --bar: rgba(243, 243, 243, 0.78);
+  --bar-line: rgba(0, 0, 0, 0.09);
+  --thumb: var(--text);
+  --shadow-soft: rgba(0, 0, 0, 0.14);
+  --chip-r: 4px;
+  --hero-size: 30px;
+  --hero-weight: 600;
+  --hero-tracking: -0.01em;
+
+  --sw-w: 40px;
+  --sw-h: 20px;
+  --sw-r: 999px;
+  --sw-thumb: 12px;
+  --sw-pad: 4px;
+  --sw-off: transparent;
+  --sw-shadow: none;
+  --sw-track-shadow: inset 0 0 0 1px var(--text-2);
+  --thumb-on: var(--on-tint);
+  --seg-r: 4px;
+  --seg-text: var(--text);
+
+  --btn-r: 4px;
+  --btn-bg: var(--surface);
+  --btn-border: rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.07) rgba(0, 0, 0, 0.18);
+  --btn-color: var(--text);
+  --btn-hover-bg: color-mix(in srgb, var(--text) 4%, var(--surface));
+  --btn-press-bg: var(--surface-press);
+  --btn-press-color: var(--text-2);
+  --btn-press-border: var(--btn-border);
+  --btn-press-move: none;
+  --primary-border: rgba(255, 255, 255, 0.08) rgba(255, 255, 255, 0.08) rgba(0, 0, 0, 0.4);
+  --danger-bg: var(--surface);
+  --danger-border: var(--btn-border);
+
+  --card-radius: 8px;
+  --card-shadow: 0 1px 2px var(--shadow-soft);
+
+  --side-item-r: 4px;
+  --side-active-bg: color-mix(in srgb, var(--text) 7%, transparent);
+  --side-active-icon: var(--tint-text);
+
+  --modal-r: 8px;
+  --modal-shadow: 0 32px 64px rgba(0, 0, 0, 0.28), 0 2px 21px rgba(0, 0, 0, 0.22);
+}
+
+:root[data-skin="fluent"][data-theme="dark"] {
+  --bar: rgba(32, 32, 32, 0.76);
+  --bar-line: rgba(255, 255, 255, 0.08);
+  --on-danger: #1b1b1b;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+  --btn-border: rgba(255, 255, 255, 0.09) rgba(255, 255, 255, 0.09) rgba(255, 255, 255, 0.04);
+}
+
+:root[data-skin="fluent"] .nav.active::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--tint);
+  transform: translateY(-50%);
+}
+
+:root[data-skin="fluent"] .modal > .modal-head h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Fluent 2 dialog: buttons on a gray strip at the bottom. */
+:root[data-skin="fluent"] .modal > .modal-foot {
+  padding: 14px 20px 16px;
+  background: color-mix(in srgb, var(--text) 4%, var(--modal-bg));
+  border-top: 1px solid color-mix(in srgb, var(--text) 8%, transparent);
+}

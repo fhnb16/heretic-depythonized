@@ -4,7 +4,7 @@
 import { api } from "./api.js";
 import { detectLanguage, translate } from "./i18n.js";
 import { listen } from "./tauri.js";
-import { DEFAULT_THEME, THEME_VARIABLES, themeVariables } from "./themes.js";
+import { DEFAULT_THEME, THEMES, THEME_VARIABLES, themeVariables } from "./themes.js";
 
 function load(key, fallback) {
   try {
@@ -31,6 +31,13 @@ export const prefs = {
   skin: load("skin", DEFAULT_THEME.id),
   // Filled from the backend's default on first start.
   checkpointDir: load("checkpointDir", ""),
+  // Updates (see update.js): check on start, include pre-release builds, time of the last
+  // check (ms), the last result, and the tag the user postponed with "Later".
+  updateAuto: load("updateAuto", true),
+  updatePrereleases: load("updatePrereleases", false),
+  updateLastCheck: load("updateLastCheck", 0),
+  updateCache: load("updateCache", null),
+  updateDismissed: load("updateDismissed", null),
 };
 
 export function t(key, params) {
@@ -47,6 +54,10 @@ export function applyTheme() {
   const root = document.documentElement;
   const dark = isDark();
   root.setAttribute("data-theme", dark ? "dark" : "light");
+  // Catalog themes scope their stylesheets (ui/themes/<id>.css) to data-skin; the app's own
+  // theme has none.
+  if (THEMES.some((theme) => theme.id === prefs.skin)) root.setAttribute("data-skin", prefs.skin);
+  else root.removeAttribute("data-skin");
   for (const name of THEME_VARIABLES) root.style.removeProperty(name);
   for (const [name, value] of Object.entries(themeVariables(prefs.skin, dark))) root.style.setProperty(name, value);
 }
@@ -78,6 +89,12 @@ export const state = {
   modelLoaded: false,
   chatStream: "",
   info: null,
+  // Update state (see update.js): last check result, whether a check or install is running,
+  // download progress ({ stage, done, total }) and the last error.
+  update: null,
+  updateBusy: null, // null | "checking" | "installing"
+  updateProgress: null,
+  updateError: null,
 };
 
 const subscribers = new Set();

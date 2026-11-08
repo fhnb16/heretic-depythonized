@@ -1,0 +1,80 @@
+/* Material 3: 40px capsules (outlined, filled, text), a full-row pill indicator in the navigation
+   rail, the M3 switch whose thumb grows when on, large light dialog titles. */
+
+:root[data-skin="material"] {
+  --bar: rgba(247, 242, 250, 0.9);
+  --bar-line: rgba(0, 0, 0, 0.06);
+  --thumb: #79747e;
+  --shadow-soft: rgba(0, 0, 0, 0.15);
+  --chip-r: 8px;
+  --hero-size: 32px;
+  --hero-weight: 400;
+  --title-weight: 500;
+
+  --sw-w: 52px;
+  --sw-h: 32px;
+  --sw-r: 16px;
+  --sw-thumb: 16px;
+  --sw-pad: 8px;
+  --sw-off: var(--surface-press);
+  --sw-shadow: none;
+  --sw-track-shadow: inset 0 0 0 2px var(--sep-strong);
+  --thumb-on: var(--on-tint);
+  --sw-thumb-on-scale: 1.5;
+  --seg-r: 20px;
+  --seg-text: var(--text);
+  --seg-on: var(--tint-soft);
+  --seg-on-text: var(--text);
+
+  --btn-r: 20px;
+  --btn-border: #79747e;
+  --btn-press-bg: var(--tint-soft);
+  --btn-press-color: var(--tint-text);
+  --btn-press-border: #79747e;
+  --btn-press-move: none;
+  --primary-border: transparent;
+
+  --card-border: 0;
+  --card-radius: 20px;
+
+  --side-item-h: 56px;
+  --side-item-r: 28px;
+  --side-gap: 4px;
+  --side-weight: 500;
+  --side-active-bg: var(--tint-soft);
+  --side-active-color: var(--text);
+
+  --bubble-user-bg: var(--tint-soft);
+
+  --modal-r: 28px;
+  --modal-border: 0;
+  --modal-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-skin="material"][data-theme="dark"] {
+  --bar: rgba(20, 18, 24, 0.9);
+  --bar-line: rgba(255, 255, 255, 0.06);
+  --thumb: #938f99;
+  --on-danger: #601410;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+  --btn-border: #938f99;
+  --btn-press-border: #938f99;
+}
+
+:root[data-skin="material"] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button):not(.icon-only) {
+  min-height: 40px;
+  padding: 0 24px;
+}
+
+:root[data-skin="material"] .nav {
+  padding: 0 16px;
+}
+
+:root[data-skin="material"] .modal > .modal-head {
+  padding-top: 24px;
+}
+
+:root[data-skin="material"] .modal > .modal-head h2 {
+  font-size: 22px;
+  font-weight: 400;
+}

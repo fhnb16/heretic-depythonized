@@ -1,0 +1,156 @@
+/* Gloss: iOS 6 skeuomorphism. White gloss buttons with bold blue embossed labels; pressed and
+   primary ones in blue gloss, danger in red; a dark linen sidebar like the iPad, whose selected
+   item is a glossy accent plate; gradient title bars. */
+
+:root[data-skin="gloss"] {
+  --bar: #8494a8;
+  --bar-line: #4a5666;
+  --shadow-soft: rgba(0, 0, 0, 0.3);
+  --gloss-edge: #3d4754;
+  --chip-r: 6px;
+  --hero-size: 30px;
+  --hero-weight: 700;
+  --hero-tracking: -0.02em;
+  --title-weight: 700;
+
+  --sw-w: 66px;
+  --sw-h: 28px;
+  --sw-r: 14px;
+  --sw-thumb: 28px;
+  --sw-pad: 0px;
+  --sw-off: linear-gradient(#e3e3e3, #fdfdfd);
+  --sw-on: linear-gradient(color-mix(in srgb, var(--tint) 75%, #000000), var(--tint));
+  --sw-track-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.3), inset 0 0 0 1px #9ea5ad;
+  --sw-track-shadow-on: inset 0 2px 3px rgba(0, 0, 0, 0.3), inset 0 0 0 1px color-mix(in srgb, var(--tint) 70%, #000000);
+  --thumb: linear-gradient(#ffffff, #d4d4d4);
+  --sw-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), inset 0 0 0 1px #a8a8a8;
+
+  --seg-r: 8px;
+  --seg-line: #8e97a3;
+  --seg-text: #4f5b6b;
+  --seg-weight: 700;
+  --seg-item-bg: linear-gradient(#ffffff 0%, #f1f2f4 50%, #e3e5e8 51%, #dadde1 100%);
+  --seg-on: linear-gradient(color-mix(in srgb, var(--tint) 55%, #ffffff) 0%, color-mix(in srgb, var(--tint) 85%, #ffffff) 50%, var(--tint) 51%, color-mix(in srgb, var(--tint) 85%, #000000) 100%);
+  --seg-on-text: #ffffff;
+
+  --btn-r: 10px;
+  --btn-bg: linear-gradient(#ffffff 0%, #f4f5f7 50%, #e6e8eb 51%, #dfe2e6 100%);
+  --btn-border: #a5acb5;
+  --btn-color: #385487;
+  --btn-weight: 700;
+  --btn-text-shadow: 0 1px 0 #ffffff;
+  --btn-shadow: inset 0 1px 0 #ffffff, 0 1px 0 rgba(255, 255, 255, 0.7);
+  --btn-hover-bg: linear-gradient(#ffffff 0%, #f8f9fa 50%, #eceef1 51%, #e6e9ec 100%);
+  --btn-press-bg: var(--seg-on);
+  --btn-press-color: #ffffff;
+  --btn-press-border: color-mix(in srgb, var(--tint) 62%, #000000);
+  --btn-press-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  --btn-press-move: none;
+  --primary-bg: var(--seg-on);
+  --primary-border: color-mix(in srgb, var(--tint) 62%, #000000);
+  --primary-color: #ffffff;
+  --primary-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
+  --primary-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  --primary-hover-bg: linear-gradient(color-mix(in srgb, var(--tint) 45%, #ffffff) 0%, color-mix(in srgb, var(--tint) 75%, #ffffff) 50%, color-mix(in srgb, var(--tint) 92%, #ffffff) 51%, var(--tint) 100%);
+  --primary-press-bg: linear-gradient(color-mix(in srgb, var(--tint) 85%, #000000), var(--tint));
+  --danger-bg: linear-gradient(#f28c88 0%, #e44c45 50%, #d2281f 51%, #bb1d16 100%);
+  --danger-border: #8e1511;
+  --danger-color: #ffffff;
+  --danger-press-bg: linear-gradient(#bb1d16, #d2281f);
+
+  --card-border: 1px solid var(--sep-strong);
+  --card-radius: 10px;
+  --card-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  /* iPad on iOS 6: dark linen with a bevel at the right edge. */
+  --side-bg:
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, #3b3f45, #23262a 60%, #1b1d20);
+  --side-border: 1px solid #000000;
+  --side-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.08), 2px 0 6px rgba(0, 0, 0, 0.35);
+  --side-brand: #ffffff;
+  --side-text: #c9ccd1;
+  --side-weight: 700;
+  --side-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.8);
+  --side-item-r: 8px;
+  --side-gap: 6px;
+  --side-hover-bg: rgba(255, 255, 255, 0.06);
+  --side-hover-color: #ffffff;
+  --side-active-bg: linear-gradient(180deg, color-mix(in srgb, var(--tint) 55%, #ffffff) 0%, color-mix(in srgb, var(--tint) 85%, #ffffff) 49%, var(--tint) 50%, color-mix(in srgb, var(--tint) 80%, #000000) 100%);
+  --side-active-border: color-mix(in srgb, var(--tint) 55%, #000000);
+  --side-active-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 4px rgba(0, 0, 0, 0.5);
+  --side-active-color: #ffffff;
+  --side-active-icon: #ffffff;
+
+  --meter-h: 9px;
+  --meter-r: 5px;
+  --meter-track: linear-gradient(#cfd4da, #eef0f2);
+  --meter-track-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.6);
+  --meter-fill: var(--seg-on);
+
+  --modal-r: 10px;
+  --modal-border: 1px solid rgba(0, 0, 0, 0.55);
+  --modal-shadow: 0 10px 34px rgba(0, 0, 0, 0.6);
+  --modal-head-bg: linear-gradient(180deg, #b6c2d2 0%, #8d9fb8 50%, #7b8eaa 51%, #6c80a0 100%);
+  --modal-head-text: #ffffff;
+  --modal-head-border: 1px solid #2d3f57;
+}
+
+:root[data-skin="gloss"][data-theme="dark"] {
+  --bar: #2a2d32;
+  --bar-line: #0c0d0f;
+  --shadow-soft: rgba(0, 0, 0, 0.6);
+  --gloss-edge: #0f1114;
+  --seg-line: #111317;
+  --seg-text: #f2f4f7;
+  --seg-item-bg: linear-gradient(#5c6169 0%, #474c53 50%, #393d43 51%, #2f3338 100%);
+  --btn-bg: linear-gradient(#5c6169 0%, #474c53 50%, #393d43 51%, #2f3338 100%);
+  --btn-hover-bg: linear-gradient(#666b73 0%, #51565d 50%, #43474d 51%, #393d42 100%);
+  --btn-border: #111317;
+  --btn-color: #f2f4f7;
+  --btn-text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+  --btn-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --danger-bg: linear-gradient(#e0605a 0%, #cc3a33 50%, #b3221b 51%, #9b1a14 100%);
+  --danger-border: #5e0d0a;
+  --card-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  --meter-track: linear-gradient(#1b1d21, #2b2e33);
+  --meter-track-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 255, 255, 0.06);
+  --modal-head-bg: linear-gradient(180deg, #555a63 0%, #3a3e45 50%, #2e3237 51%, #25282c 100%);
+  --modal-head-border: 1px solid #000000;
+}
+
+:root[data-skin="gloss"] .segmented > button {
+  text-shadow: 0 1px 0 #ffffff;
+}
+
+:root[data-skin="gloss"] .segmented > button.active,
+:root[data-skin="gloss"][data-theme="dark"] .segmented > button {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+:root[data-skin="gloss"] .card > h3 {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+:root[data-skin="gloss"][data-theme="dark"] .card > h3 {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.6);
+}
+
+:root[data-skin="gloss"] .nav .icon {
+  filter: drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.8));
+}
+
+:root[data-skin="gloss"] .nav.active {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.45);
+}
+
+:root[data-skin="gloss"] .modal > .modal-head {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+:root[data-skin="gloss"] .modal > .modal-head h2 {
+  font-size: 17px;
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.45);
+}

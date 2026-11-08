@@ -1,0 +1,79 @@
+/* Board: green terminal. Dark navy canvas, acid-green accent, monospace text, thin frames;
+   the selected menu item has a cursor bar at its left edge. */
+
+:root[data-skin="board"] {
+  --bar: rgba(11, 16, 23, 0.86);
+  --bar-line: #1e2a38;
+  --thumb: #dfe7ef;
+  --on-danger: #0b1017;
+  --shadow-soft: rgba(0, 0, 0, 0.4);
+  --chip-r: 2px;
+  --hero-size: 28px;
+  --hero-weight: 700;
+  --hero-tracking: -0.01em;
+  --hero-color: var(--tint);
+
+  --sw-w: 44px;
+  --sw-h: 24px;
+  --sw-r: 3px;
+  --sw-thumb-r: 2px;
+  --sw-pad: 3px;
+  --sw-shadow: none;
+  --seg-r: 2px;
+
+  --btn-r: 2px;
+  --card-radius: 3px;
+  --side-item-r: 2px;
+  --side-active-bg: transparent;
+  --side-active-color: var(--tint);
+  --side-active-icon: var(--tint);
+  --side-transform: lowercase;
+  --side-tracking: 0.02em;
+
+  --log-bg: #0b1017;
+  --log-border: 1px solid var(--sep);
+  --bubble-user-bg: transparent;
+
+  --modal-r: 0;
+  --modal-border: 1px solid var(--tint);
+  --modal-shadow: none;
+  --modal-head-bg: var(--tint);
+  --modal-head-text: var(--bg);
+  --overlay: rgba(0, 0, 0, 0.72);
+}
+
+:root[data-skin="board"][data-theme="light"] {
+  --bar: rgba(244, 247, 250, 0.9);
+  --bar-line: #dde4ec;
+  --thumb: #ffffff;
+  --on-danger: #ffffff;
+  /* Bright green headings are unreadable on white: darken the accent. */
+  --hero-color: color-mix(in srgb, var(--tint) 55%, #000000);
+  --side-active-color: color-mix(in srgb, var(--tint) 50%, #000000);
+  --side-active-icon: color-mix(in srgb, var(--tint) 50%, #000000);
+  --log-bg: #eef2f6;
+}
+
+:root[data-skin="board"] .nav.active::after {
+  content: "";
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  left: 0;
+  width: 3px;
+  background: var(--tint);
+}
+
+:root[data-skin="board"] .bubble.user {
+  border: 1px dashed var(--sep-strong);
+}
+
+:root[data-skin="board"] .modal > .modal-head h2 {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+:root[data-skin="board"] .modal > .modal-head button.ghost {
+  border-radius: 0;
+}

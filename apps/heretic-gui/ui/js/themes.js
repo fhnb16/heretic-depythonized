@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Color themes ported from the theme catalog (see AGENTS.md, "Themes") at the token level:
-// palette of both modes, font, radii and accent. Layout stays the app's own; decorations the catalog
-// draws with extra CSS (glossy gradients, bevels, glows) are deliberately not ported.
+// Color themes ported from the theme catalog (see AGENTS.md, "Themes"). This file holds what JS
+// needs: the palette of both modes, font, radii, accent and companion color, and the accent math
+// of the catalog's applyTheme(). Everything else a theme draws (gloss, bevels, glass, frames,
+// switches, segments, the sidebar selection, dialog title bars) lives in ui/themes/<id>.css,
+// scoped to <html data-skin="<id>">.
 //
 // Palette order: [bg, surface, surface-press, separator, separator-strong, text, text-2,
 // text-3, danger, ok]. Values may use var(--accent) (monochrome terminal themes).
+// `side`: sidebar color for the preview tile, when it differs from the surface.
 
 const SANS_APPLE = '-apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif';
 const ACC = (pct, base) => `color-mix(in srgb, var(--accent) ${pct}%, ${base})`;
@@ -17,9 +20,9 @@ export const THEMES = [
     font: '"Segoe UI", Tahoma, Verdana, sans-serif',
     r: 3,
     rc: 6,
-    // The catalog paints a blue desktop behind white windows; the light page is softened so
-    // headings that sit on the page stay readable.
-    light: ["#cfe0f1", "#ffffff", "#e5f1fb", "#dfe8f2", "#8fb0d6", "#1e1e1e", "#4a5d73", "#7f8fa3", "#c42b1c", "#2c9e2c"],
+    side: ["#1a2a3e", "#101c2c"],
+    // A blue desktop behind white windows (themes/aero.css paints the gradient).
+    light: ["#2f74b8", "#ffffff", "#e5f1fb", "#dfe8f2", "#8fb0d6", "#1e1e1e", "#4a5d73", "#7f8fa3", "#c42b1c", "#2c9e2c"],
     dark: ["#0d2440", "#1b2838", "#24405e", "#2a3b50", "#3f6a98", "#eaf2fb", "#a8bfd6", "#7089a3", "#e5544a", "#4cbf4c"],
   },
   {
@@ -113,6 +116,7 @@ export const THEMES = [
     font: '"Helvetica Neue", Helvetica, Arial, sans-serif',
     r: 8,
     rc: 10,
+    side: ["#2a2d31", "#2a2d31"],
     light: ["#c5ccd3", "#ffffff", "#d9dde2", "#a9b1b9", "#8b959f", "#1b1f24", "#5c6773", "#8e99a4", "#d9291c", "#3d9c3d"],
     dark: ["#23262b", "#30343a", "#3b4047", "#1a1c20", "#121417", "#eef1f4", "#a7afb9", "#7b838d", "#e5544a", "#4cb04c"],
   },
@@ -130,6 +134,7 @@ export const THEMES = [
     id: "groove",
     name: "Groove",
     accent: "#1ed760",
+    side: ["#f6f6f6", "#000000"],
     font: '"Helvetica Neue", Helvetica, Arial, sans-serif',
     r: 8,
     rc: 8,
@@ -162,6 +167,7 @@ export const THEMES = [
     id: "lounge",
     name: "Lounge",
     accent: "#5865f2",
+    side: ["#e3e5e8", "#1e1f22"],
     font: '"Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif',
     r: 4,
     rc: 8,
@@ -195,6 +201,10 @@ export const THEMES = [
     accent: "#00e5ff",
     accentLight: "#008a99",
     accentDark: "#a8843a",
+    companion: "#ffc107",
+    companionLight: "#b8860b",
+    companionDark: "#00e5ff",
+    side: ["#e6dfcd", "#0b0d11"],
     font: 'Inter, Tahoma, "Segoe UI", sans-serif',
     display: '"Cinzel", "Trajan Pro", "Times New Roman", serif',
     r: 3,
@@ -206,6 +216,7 @@ export const THEMES = [
     id: "neon",
     name: "Neon",
     accent: "#fe2c55",
+    companion: "#25f4ee",
     font: '"Proxima Nova", Inter, -apple-system, "Segoe UI", Arial, sans-serif',
     r: 4,
     rc: 8,
@@ -241,6 +252,11 @@ export const THEMES = [
     name: "Patch",
     accent: "#67c1f5",
     accentLight: "#1a75b8",
+    accentDark: "#67c1f5",
+    companion: "#a4d007",
+    companionLight: "#5c7e10",
+    companionDark: "#a4d007",
+    side: ["#dce2e8", "#202020"],
     font: '"Motiva Sans", Arial, Tahoma, Helvetica, sans-serif',
     r: 2,
     rc: 3,
@@ -271,6 +287,7 @@ export const THEMES = [
     id: "vapor",
     name: "Vapor",
     accent: "#2d73ff",
+    side: ["#e9ecf0", "#171a1f"],
     font: '"Motiva Sans", "Segoe UI", "Helvetica Neue", Arial, Helvetica, sans-serif',
     r: 3,
     rc: 4,
@@ -326,6 +343,32 @@ function contrast(a, b) {
   return (l1 + 0.05) / (l2 + 0.05);
 }
 
+function toHsl(hex) {
+  const [r, g, b] = toRgb(hex).map((v) => v / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h * 60, s, l];
+}
+
+function fromHsl(h, s, l) {
+  const k = (n) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+  return toHex([f(0), f(8), f(4)].map((v) => v * 255));
+}
+
+/** The catalog's second color: the accent's hue + 38°, saturation at least 0.55, lightness at
+ *  most 0.42 in light mode and at least 0.62 in dark mode so it reads on the background. */
+function companion(base, dark) {
+  const [h, s, l] = toHsl(base);
+  return fromHsl((h + 38) % 360, Math.max(s, 0.55), dark ? Math.max(l, 0.62) : Math.min(l, 0.42));
+}
+
 /** Accent shade for text and outlines on the surface: at least 4.5:1 where it can be computed. */
 function accentInk(accent, surface, text) {
   if (!isHex(surface) || !isHex(text)) return "color-mix(in srgb, var(--accent) 72%, var(--text))";
@@ -345,10 +388,15 @@ export function themeVariables(id, dark) {
   const accent = dark ? mix(base, "#ffffff", 0.18) : base;
   const hover = dark ? mix(accent, "#ffffff", 0.22) : mix(accent, "#000000", 0.18);
   const [r, g, b] = toRgb(accent);
-  // White on mid-tone accents (blue, violet) where it holds 3:1 for 14px/500 button labels,
-  // dark text on light accents (yellow, orange, lime).
-  const onAccent = contrast(accent, "#ffffff") >= 3 ? "#ffffff" : "#101010";
+  // The catalog's rule: dark text on bright accents, white otherwise.
+  const onAccent = luminance(accent) > 0.5 ? "#101010" : "#ffffff";
   const pick = (pair) => (pair ? pair[dark ? 1 : 0] : null);
+  // Monochrome terminals take the second color from the accent's own hue.
+  const mono = theme.id === "grid" || theme.id === "board";
+  const second =
+    (dark ? theme.companionDark : theme.companionLight) ??
+    theme.companion ??
+    (mono ? mix(accent, dark ? "#ffffff" : "#000000", 0.35) : companion(base, dark));
 
   return {
     "--bg": bg,
@@ -367,8 +415,10 @@ export function themeVariables(id, dark) {
     "--accent-ink": accentInk(accent, pick(theme.solid) ?? surface, text),
     "--on-accent": onAccent,
     "--good": good,
-    // Semantic, not decorative: "interrupted" stays amber in every theme.
+    // The catalog's --warn is a decorative second color; the app's --warn means "interrupted"
+    // and stays amber in every theme, so the second color is --companion.
     "--warn": dark ? "#e0b04a" : "#9a6a00",
+    "--companion": second,
     "--bad": bad,
     "--font": theme.font,
     "--font-display": theme.display ?? theme.font,
@@ -382,20 +432,25 @@ export function themeVariables(id, dark) {
 export function themePreview(id, dark) {
   const theme = THEMES.find((t) => t.id === id);
   if (!theme) {
+    const base = { radius: "8px", buttonRadius: "8px", onAccent: "#1d1403" };
     return dark
-      ? { bg: "#141414", surface: "#1b1b1b", line: "#2b2b2b", text: "#ececea", muted: "#74746f", accent: "#f2a93b" }
-      : { bg: "#f4f4f3", surface: "#ffffff", line: "#e3e3e0", text: "#1b1b1a", muted: "#8a8a85", accent: "#f0a020" };
+      ? { ...base, bg: "#141414", surface: "#1b1b1b", side: "#1b1b1b", line: "#2b2b2b", text: "#ececea", muted: "#74746f", accent: "#f2a93b" }
+      : { ...base, bg: "#f4f4f3", surface: "#ffffff", side: "#ffffff", line: "#e3e3e0", text: "#1b1b1a", muted: "#8a8a85", accent: "#f0a020" };
   }
   const vars = themeVariables(id, dark);
   const resolve = (value) => value.replaceAll("var(--accent)", vars["--accent"]);
+  const surface = resolve(vars["--surface-elev"]);
   return {
     bg: resolve(vars["--bg"]),
-    surface: resolve(vars["--surface-elev"]),
+    surface,
+    side: theme.side ? theme.side[dark ? 1 : 0] : surface,
     line: resolve(vars["--border-strong"]),
     text: resolve(vars["--text"]),
     muted: resolve(vars["--text-3"]),
     accent: vars["--accent"],
-    radius: vars["--radius-sm"],
+    onAccent: vars["--on-accent"],
+    radius: vars["--radius"],
+    buttonRadius: `${Math.min(theme.rb ?? theme.r, 8)}px`,
     font: theme.font,
   };
 }

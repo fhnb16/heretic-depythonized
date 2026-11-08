@@ -1,5 +1,5 @@
 // Mock of the Tauri API for testing the UI in a plain browser.
-// Usage: ui-test/index.html?scenario=home|new|run|results|chat|settings&lang=ru|en&theme=light|dark&skin=heretic|<theme id>
+// Usage: ui-test/index.html?scenario=home|new|run|results|chat|settings|update|updating&lang=ru|en&theme=light|dark&skin=heretic|<theme id>
 
 (function () {
   const params = new URLSearchParams(location.search);
@@ -8,6 +8,11 @@
   localStorage.setItem("heretic.theme", JSON.stringify(params.get("theme") ?? "light"));
   localStorage.setItem("heretic.skin", JSON.stringify(params.get("skin") ?? "heretic"));
   localStorage.setItem("heretic.checkpointDir", JSON.stringify("C:\\Users\\me\\Documents\\Heretic\\checkpoints"));
+  localStorage.setItem("heretic.llamaCppDir", JSON.stringify("C:\\tools\\llama.cpp"));
+  // Every scenario starts without a remembered update check, so the startup check always runs.
+  for (const key of ["updateLastCheck", "updateCache", "updateDismissed", "updateAuto", "updatePrereleases"]) {
+    localStorage.removeItem(`heretic.${key}`);
+  }
 
   const errors = [];
   function report(message) {
@@ -86,10 +91,26 @@
     chat_send: { response: "Sure! Here is a detailed answer to your question." },
     chat_stop: null,
     save_model: { directory: "D:\\models\\out", files: [] },
+    save_gguf: { path: "D:\\models\\out\\Qwen2.5-0.5B-Instruct-heretic-Q4_K_M.gguf", bytes: 397.8e6, type: "Q4_K_M" },
+    check_llama_cpp: { ok: true, directory: "C:\\tools\\llama.cpp", quantize: "C:\\tools\\llama.cpp\\llama-quantize.exe", version: "12202 (3f5d1a2)" },
     hf_whoami: { name: "me", fullname: "Me Myself", email: null },
     upload_model: { repo_id: "me/model-heretic" },
     model_card_preview: "---\ntags:\n- heretic\n---\n\n# This is a decensored version of ...",
     forget_token: null,
+    update_current_version: "2.1.4",
+    // The update scenarios and Settings see a newer release; the others are up to date.
+    check_update: ["update", "updating", "settings", "about"].includes(scenario)
+      ? {
+          current: "2.1.4", available: true, latest: "2.2.0", tag: "v2.2.0", name: "Heretic v2.2.0", prerelease: false,
+          notes: "## What's changed\n* Qwen3.5 and Gemma 4 support", url: "https://github.com/fhnb16/heretic-depythonized/releases/tag/v2.2.0",
+          published_at: "2026-11-08T12:00:00Z",
+          asset: { name: "heretic-2.2.0-windows-x64-cuda12-setup.exe", size: 412e6, url: "https://github.com/fhnb16/heretic-depythonized/releases/download/v2.2.0/heretic-2.2.0-windows-x64-cuda12-setup.exe" },
+          checksums_url: "https://github.com/fhnb16/heretic-depythonized/releases/download/v2.2.0/SHA256SUMS.txt",
+          install: "installer",
+        }
+      : { current: "2.1.4", available: false, latest: "2.1.4", tag: "v2.1.4", name: null, prerelease: false, notes: null, url: null, published_at: null, asset: null, checksums_url: null, install: "browser" },
+    install_update: "restarting",
+    open_release_page: null,
   };
 
   window.__TAURI__ = {
@@ -142,6 +163,17 @@
         await wait(450);
         click("Qwen/Qwen3-4B-Instruct-2507");
         break;
+      case "gguf":
+        responses.inspect_model = {
+          id: "D:\\models\\Qwen3.5-0.8B-Q4_K_M.gguf", supported: false, problem: "gguf",
+          message: "D:\\models\\Qwen3.5-0.8B-Q4_K_M.gguf is a GGUF file", model_type: null, architectures: [],
+          layers: null, multimodal: false, checkpoint_dtype: null, weights_bytes: null, has_chat_template: false,
+        };
+        h.set({ view: "new" });
+        await wait(300);
+        document.querySelector("input[type=text]").value = "D:\\models\\Qwen3.5-0.8B-Q4_K_M.gguf";
+        document.querySelector("input[type=text]").dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+        break;
       case "goal":
         h.set({ view: "new" });
         await wait(300);
@@ -176,6 +208,19 @@
         await wait(300);
         click(params.get("lang") === "en" ? "Log" : "Журнал");
         break;
+      case "savegguf":
+        // The export dialog with the GGUF option and a quantization type.
+        await h.launch(settings, null);
+        emit("heretic://status", { state: "ready" });
+        await wait(300);
+        h.set({ view: "results" });
+        await wait(300);
+        click(params.get("lang") === "en" ? "Save" : "Сохранить");
+        await wait(300);
+        click("GGUF");
+        await wait(200);
+        document.querySelector(".modal input[type=text]").value = "D:\\models\\out";
+        break;
       case "results":
       case "chat":
       case "export":
@@ -196,6 +241,21 @@
         break;
       case "settings":
         h.set({ view: "settings" });
+        break;
+      case "update":
+        // The startup check finds a release: the notice shows above the run status.
+        break;
+      case "about":
+        // Settings scrolled to the About card with the update controls.
+        h.set({ view: "settings" });
+        await wait(300);
+        document.querySelector("main").scrollTop = 1e6;
+        break;
+      case "updating":
+        // The same notice while the installer is downloading.
+        await wait(300);
+        h.set({ updateBusy: "installing" });
+        emit("heretic://update", { stage: "downloading", done: 158e6, total: 412e6 });
         break;
       case "failed":
         await h.launch(settings, null);

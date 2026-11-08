@@ -1,0 +1,56 @@
+/* Neon: black screen, a bright pink-red accent with a turquoise second color, bold large type,
+   the signature double color shift on the selected item, glowing dialog frame. */
+
+:root[data-skin="neon"] {
+  --bar: #000000;
+  --bar-line: #1f1f1f;
+  --shadow-soft: transparent;
+  --chip-r: 4px;
+  --hero-size: 32px;
+  --hero-weight: 800;
+  --title-weight: 700;
+
+  --sw-w: 44px;
+  --sw-h: 24px;
+  --sw-r: 999px;
+  --sw-thumb: 20px;
+  --sw-off: #2f2f2f;
+  --sw-shadow: none;
+  --seg-r: 4px;
+  --seg-line: #2f2f2f;
+  --seg-weight: 700;
+
+  --btn-r: 4px;
+  --btn-weight: 700;
+
+  --card-border: 0;
+  --card-radius: 8px;
+
+  --side-active-bg: transparent;
+  --side-active-color: var(--text);
+  --side-active-icon: var(--text);
+  --side-weight: 700;
+
+  --bubble-user-bg: var(--tint);
+  --bubble-user-color: var(--on-tint);
+
+  --modal-border: 1px solid var(--tint);
+  --modal-shadow: 0 0 0 1px color-mix(in srgb, var(--tint) 40%, transparent), 0 0 28px color-mix(in srgb, var(--tint) 45%, transparent);
+  --overlay: rgba(0, 0, 0, 0.62);
+}
+
+:root[data-skin="neon"][data-theme="light"] {
+  --bar: #ffffff;
+  --bar-line: #ededee;
+  --sw-off: #d6d6d8;
+  --seg-line: #d6d6d8;
+}
+
+/* The double shift: shadows in the second color and the accent around the selected icon. */
+:root[data-skin="neon"] .nav.active .icon {
+  filter: drop-shadow(-1.5px 0 0 var(--companion)) drop-shadow(1.5px 0 0 var(--tint));
+}
+
+:root[data-skin="neon"] .modal > .modal-head h2 {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--tint) 70%, transparent);
+}

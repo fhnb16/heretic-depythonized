@@ -1,0 +1,196 @@
+/* Vapor: dialogs of a 2020s desktop game client. Graphite windows with a radial sheen from the top
+   left, flat buttons that lift with a shadow on hover, a primary button whose accent gradient shifts
+   on hover and press, recessed switch and progress wells with a glowing fill, uppercase segments. */
+
+:root[data-skin="vapor"] {
+  --bar: rgba(23, 26, 31, 0.94);
+  --bar-line: rgba(0, 0, 0, 0.5);
+  --thumb: #dfe3e6;
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+  --chip-r: 2px;
+  --dur: 0.2s;
+  --vp-head: #ffffff;
+  --vp-btn: #3d4450;
+  --vp-btn-hover: #464d58;
+  --vp-btn-press: #393f49;
+  --vp-btn-text: #dfe3e6;
+  --vp-btn-lift: 0 8px 16px rgba(0, 0, 0, 0.3);
+  --vp-btn-sink: 0 1px 4px rgba(0, 0, 0, 0.6);
+  --vp-well: #202226;
+  --vp-well-rim: #2a2d33;
+  --vp-well-shade: #131313;
+  --vp-field-focus: #23262e;
+  --vp-glow: color-mix(in srgb, var(--tint) 22%, transparent);
+  --vp-line: linear-gradient(to right, color-mix(in srgb, var(--tint) 50%, #ffffff), var(--tint));
+  --vp-fill: linear-gradient(to bottom, color-mix(in srgb, var(--tint) 50%, #ffffff) 0%, var(--tint) 80%);
+  --vp-grab: linear-gradient(to bottom, color-mix(in srgb, var(--tint) 35%, #ffffff) 0%, color-mix(in srgb, var(--tint) 55%, #ffffff) 80%);
+  --vp-primary: linear-gradient(to right, color-mix(in srgb, var(--tint) 60%, #ffffff) 0%, color-mix(in srgb, var(--tint) 72%, #000000) 60%);
+  --vp-sheen: radial-gradient(circle at top left, rgba(74, 81, 92, 0.4) 0%, rgba(75, 81, 92, 0) 60%);
+  --page: var(--vp-sheen), var(--bg);
+  --hero-size: 26px;
+  --hero-weight: 300;
+  --hero-tracking: 0.08em;
+  --hero-transform: uppercase;
+  --hero-color: var(--vp-head);
+  --title-weight: 300;
+  --title-transform: uppercase;
+  --title-tracking: 0.04em;
+  --title-color: var(--text-2);
+
+  --sw-w: 44px;
+  --sw-thumb: 16px;
+  --sw-pad: 3px;
+  --sw-off: var(--vp-well);
+  --sw-on: var(--vp-fill);
+  --sw-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.2);
+  --sw-track-shadow: 0 0 0 1px var(--vp-well-rim), inset 0 6px 6px -5px var(--vp-well-shade);
+  --sw-track-shadow-on: 0 0 0 1px var(--vp-well-rim), 0 0 8px var(--vp-glow);
+  --thumb-on: var(--vp-grab);
+  --seg-r: 3px;
+  --seg-line: #3a3f48;
+  --seg-text: #9ea4ab;
+  --seg-bg: var(--vp-btn);
+  --seg-weight: 400;
+  --seg-transform: uppercase;
+  --seg-on-shadow: inset 0 -2px 0 color-mix(in srgb, var(--tint) 60%, #000000);
+
+  --field-line: transparent;
+  --field-r: 3px;
+
+  --btn-r: 2px;
+  --btn-bg: var(--vp-btn);
+  --btn-border: transparent;
+  --btn-color: var(--vp-btn-text);
+  --btn-weight: 400;
+  --btn-hover-bg: var(--vp-btn-hover);
+  --btn-hover-color: #ffffff;
+  --btn-hover-shadow: var(--vp-btn-lift);
+  --btn-press-bg: var(--vp-btn-press);
+  --btn-press-color: #ffffff;
+  --btn-press-border: transparent;
+  --btn-press-shadow: var(--vp-btn-sink);
+  --btn-press-move: none;
+  --primary-border: transparent;
+  --primary-color: #ffffff;
+  --primary-text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  --primary-hover-color: #ffffff;
+  --primary-press-color: #ffffff;
+  --danger-bg: var(--vp-btn);
+  --danger-border: transparent;
+  --danger-color: color-mix(in srgb, var(--danger) 55%, #ffffff);
+
+  --card-bg: var(--vp-sheen), var(--surface);
+  --card-border: 1px solid transparent;
+  --card-radius: 4px;
+  --card-shadow: 0 2px 8px var(--shadow-soft);
+  --card-hover-bg: var(--vp-sheen), #363b44;
+
+  --side-bg: var(--vp-sheen), var(--bar);
+  --side-border: 0;
+  --side-shadow: inset -1px 0 0 var(--bar-line), 2px 0 10px var(--shadow-soft);
+  --side-text: var(--text-3);
+  --side-transform: uppercase;
+  --side-tracking: 0.06em;
+  --side-item-r: 2px;
+  --side-hover-bg: color-mix(in srgb, var(--text) 7%, transparent);
+  --side-hover-color: var(--vp-head);
+  --side-active-bg: linear-gradient(to right, color-mix(in srgb, var(--tint) 26%, transparent), color-mix(in srgb, var(--tint) 6%, transparent));
+  --side-active-shadow: inset 3px 0 0 var(--tint);
+  --side-active-color: var(--vp-head);
+  --side-active-icon: var(--tint-text);
+
+  --meter-h: 8px;
+  --meter-r: 10px;
+  --meter-track: var(--vp-well);
+  --meter-track-shadow: 0 0 0 2px var(--vp-well-rim), inset 0 6px 6px -5px var(--vp-well-shade);
+  --meter-fill: var(--vp-fill);
+
+  --log-bg: var(--vp-well);
+
+  --modal-r: 3px;
+  --modal-bg: var(--vp-line) top left / 100% 1px no-repeat, var(--vp-sheen), var(--bg-elev);
+  --modal-border: 0;
+  --modal-shadow: 0 8px 38px 5px rgba(0, 0, 0, 0.75);
+  --modal-head-text: var(--vp-head);
+  --overlay: rgba(0, 0, 0, 0.8);
+}
+
+:root[data-skin="vapor"][data-theme="light"] {
+  --bar: rgba(233, 236, 240, 0.94);
+  --bar-line: rgba(28, 32, 38, 0.16);
+  --thumb: #ffffff;
+  --shadow-soft: rgba(25, 30, 40, 0.18);
+  --vp-head: #12161b;
+  --vp-btn: #d8dde3;
+  --vp-btn-hover: #cdd3da;
+  --vp-btn-press: #c2c9d1;
+  --vp-btn-text: #1c2026;
+  --vp-btn-lift: 0 6px 12px rgba(25, 30, 40, 0.16);
+  --vp-btn-sink: inset 0 1px 3px rgba(25, 30, 40, 0.3);
+  --vp-well: #c9cfd6;
+  --vp-well-rim: #e3e7eb;
+  --vp-well-shade: #9aa2ac;
+  --vp-field-focus: #ffffff;
+  --vp-glow: color-mix(in srgb, var(--tint) 14%, transparent);
+  --vp-sheen: radial-gradient(circle at top left, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 60%);
+  --sw-shadow: 0 1px 2px rgba(20, 26, 34, 0.35);
+  --seg-line: #d3d8de;
+  --seg-text: #565e69;
+  --btn-hover-color: #0b0e12;
+  --btn-press-color: #0b0e12;
+  --danger-color: var(--danger);
+  --card-hover-bg: var(--vp-sheen), #eceff3;
+  --modal-shadow: 0 8px 38px 5px rgba(25, 30, 40, 0.3);
+  --overlay: rgba(20, 24, 30, 0.55);
+}
+
+/* Primary: an accent gradient 330% wide; its position is the state. */
+:root[data-skin="vapor"] button.primary:not(.ghost),
+:root[data-skin="vapor"] button.primary:not(.ghost):hover:not(:disabled),
+:root[data-skin="vapor"] button.primary:not(.ghost):active:not(:disabled) {
+  background: var(--vp-primary);
+  background-size: 330% 100%;
+  background-position: 25% 0;
+  transition:
+    background-position var(--dur) ease-out,
+    box-shadow var(--dur) ease-out;
+}
+
+:root[data-skin="vapor"] button.primary:not(.ghost):hover:not(:disabled) {
+  background-position: 0% 0;
+  box-shadow: var(--vp-btn-lift);
+}
+
+:root[data-skin="vapor"] button.primary:not(.ghost):active:not(:disabled) {
+  background-position: 40% 0;
+}
+
+:root[data-skin="vapor"] :is(input[type="text"], input[type="password"], input[type="number"], select, textarea) {
+  background: color-mix(in srgb, var(--vp-btn) 50%, transparent);
+  font-weight: 300;
+}
+
+:root[data-skin="vapor"] :is(input[type="text"], input[type="password"], input[type="number"], select, textarea):focus {
+  background: var(--vp-field-focus);
+  border-color: transparent;
+  box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-skin="vapor"] .segmented > button {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+:root[data-skin="vapor"] .segmented > button.active {
+  font-weight: 700;
+}
+
+/* A 1px accent line above the dialog title and a fading glow below it. */
+:root[data-skin="vapor"] .modal > .modal-head {
+  background: linear-gradient(to bottom, var(--vp-glow) 0, transparent 24px);
+}
+
+:root[data-skin="vapor"] .modal > .modal-head button.ghost:hover:not(:disabled) {
+  background: #e22a27;
+  color: #ffffff;
+}

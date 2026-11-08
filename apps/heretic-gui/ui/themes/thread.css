@@ -1,0 +1,66 @@
+/* Thread: a dark board with posts as separate panels, orange buttons in a thin frame on a dark
+   background, a large bold section title in the accent. */
+
+:root[data-skin="thread"] {
+  --bar: #16202d;
+  --bar-line: #2a3a4e;
+  --thumb: #d7dde5;
+  --shadow-soft: transparent;
+  --chip-r: 4px;
+  --hero-size: 30px;
+  --hero-weight: 700;
+  --hero-color: var(--tint);
+  --title-weight: 700;
+
+  --sw-w: 44px;
+  --sw-r: 11px;
+  --sw-shadow: none;
+  --seg-r: 4px;
+  --seg-text: var(--tint-text);
+  --seg-item-bg: var(--surface);
+  --seg-weight: 700;
+  --seg-on: var(--surface-press);
+  --seg-on-text: var(--tint-text);
+  --seg-on-shadow: inset 0 -3px 0 var(--tint);
+
+  --btn-r: 4px;
+  --btn-bg: var(--surface);
+  --btn-border: var(--sep-strong);
+  --btn-color: var(--tint-text);
+  --btn-weight: 700;
+  --btn-hover-bg: var(--surface-press);
+  --btn-press-bg: var(--surface-press);
+  --btn-press-color: var(--tint-text);
+  --btn-press-border: var(--tint);
+  --primary-bg: var(--surface-press);
+  --primary-border: var(--tint);
+  --primary-color: var(--tint-text);
+  --primary-shadow: inset 0 0 0 1px var(--tint);
+  --primary-hover-bg: color-mix(in srgb, var(--tint) 14%, var(--surface-press));
+  --primary-press-bg: color-mix(in srgb, var(--tint) 22%, var(--surface-press));
+  --primary-press-color: var(--tint-text);
+  --danger-bg: var(--surface);
+
+  --card-border: 0;
+  --card-radius: 4px;
+
+  --side-brand: var(--tint);
+  --side-item-r: 4px;
+  --side-active-bg: var(--surface);
+  --side-active-color: var(--tint-text);
+  --side-active-icon: var(--tint-text);
+  --side-active-shadow: inset 3px 0 0 var(--tint);
+
+  --modal-r: 16px;
+  --overlay: rgba(0, 0, 0, 0.42);
+}
+
+:root[data-skin="thread"][data-theme="light"] {
+  --bar: #eeeeee;
+  --bar-line: #cccccc;
+  --thumb: #ffffff;
+}
+
+:root[data-skin="thread"] .brand .icon {
+  color: var(--tint);
+}

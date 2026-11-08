@@ -1,0 +1,62 @@
+/* Ink: black canvas without cards, hairline gray separators, bold names, capsule buttons,
+   accent fills; dialogs as paper with an offset shadow. */
+
+:root[data-skin="ink"] {
+  --bar: rgba(0, 0, 0, 0.72);
+  --bar-line: #2f3336;
+  --shadow-soft: rgba(0, 0, 0, 0);
+  --chip-r: 999px;
+  --hero-size: 30px;
+  --hero-weight: 800;
+  --hero-tracking: -0.02em;
+  --title-weight: 700;
+
+  --sw-w: 44px;
+  --sw-h: 24px;
+  --sw-r: 999px;
+  --sw-thumb: 20px;
+  --sw-shadow: none;
+  --seg-r: 999px;
+  --seg-on: var(--text);
+  --seg-on-text: var(--bg);
+
+  --btn-r: 999px;
+  --btn-weight: 700;
+  --btn-border: var(--sep-strong);
+  --btn-color: var(--text);
+  --btn-hover-bg: color-mix(in srgb, var(--text) 8%, transparent);
+
+  --card-bg: transparent;
+  --card-radius: 16px;
+
+  --side-bg: var(--bg);
+  --side-item-r: 999px;
+  --side-active-bg: transparent;
+  --side-active-color: var(--text);
+  --side-active-icon: var(--text);
+  --side-hover-bg: color-mix(in srgb, var(--text) 10%, transparent);
+
+  --bubble-user-bg: var(--tint);
+  --bubble-user-color: var(--on-tint);
+
+  --modal-r: 2px;
+  --modal-bg: var(--surface);
+  --modal-border: 1px solid var(--sep-strong);
+  --modal-shadow: 4px 4px 0 var(--sep-strong);
+  --modal-head-border: 1px solid var(--sep-strong);
+  --overlay: rgba(0, 0, 0, 0.3);
+}
+
+:root[data-skin="ink"][data-theme="light"] {
+  --bar: rgba(255, 255, 255, 0.85);
+  --bar-line: #eff3f4;
+  --shadow-soft: rgba(0, 0, 0, 0.08);
+}
+
+:root[data-skin="ink"] .nav.active {
+  font-weight: 700;
+}
+
+:root[data-skin="ink"] .nav.active .icon svg {
+  stroke-width: 2.4;
+}

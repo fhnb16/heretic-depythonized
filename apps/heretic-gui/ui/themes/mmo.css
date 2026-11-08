@@ -1,0 +1,225 @@
+/* MMO: "rune steel and ether glass". Glass windows in a three-layer frame (blackened iron,
+   mithril bevel with a highlight, azure seam) with corner brackets and a glass sheen; serif
+   small-caps titles in a metal gradient; mithril plate buttons with ivory labels in a black outline
+   that sink by 1px when pressed; recessed slots in the sidebar. Light mode: stone and parchment. */
+
+:root[data-skin="mmo"] {
+  --bar: rgba(14, 17, 22, 0.62);
+  --bar-line: #0b0d11;
+  --thumb: #e2e8f0;
+  --shadow-soft: rgba(0, 0, 0, 0.65);
+  --chip-r: 3px;
+  --frame-iron: #0b0d11;
+  --mithril: #8a97a8;
+  --mithril-hi: #d5dfeb;
+  --slot-bg: rgba(8, 10, 13, 0.95);
+  --ivory: #ede8df;
+  --font-header: "Cinzel", "Trajan Pro", "Times New Roman", serif;
+  --metal-text: linear-gradient(180deg, #e2e8f0 0%, #a4b0c0 100%);
+  --glass: linear-gradient(180deg, rgba(28, 34, 44, 0.85) 0%, rgba(14, 17, 22, 0.8) 100%);
+  --page: radial-gradient(ellipse at 50% 40%, #181c24 0%, #0f1217 75%);
+  --hero-size: 22px;
+  --hero-weight: 600;
+  --hero-tracking: 0.08em;
+  --hero-font: var(--font-header);
+  --title-font: var(--font-header);
+  --title-tracking: 0.06em;
+
+  --sw-w: 36px;
+  --sw-h: 18px;
+  --sw-r: 3px;
+  --sw-thumb: 14px;
+  --sw-thumb-r: 2px;
+  --sw-off: var(--slot-bg);
+  --sw-shadow: 0 0 6px color-mix(in srgb, var(--tint) 60%, transparent);
+  --sw-track-shadow: inset 0 0 0 1px var(--frame-iron);
+  --sw-track-shadow-on: inset 0 0 0 1px var(--frame-iron);
+  --seg-r: 3px;
+  --seg-line: var(--frame-iron);
+  --seg-text: #9ba5b7;
+  --seg-bg: var(--slot-bg);
+  --seg-pad: 2px;
+  --seg-item-r: 1px;
+  --seg-on: linear-gradient(180deg, #4a5463, #2a313b);
+  --seg-on-text: #f0f4f8;
+  --seg-on-shadow: inset 0 1px 0 var(--mithril-hi), inset 0 -2px 0 var(--companion);
+
+  --field-line: color-mix(in srgb, var(--mithril) 22%, transparent);
+  --field-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+
+  --btn-r: 3px;
+  --btn-bg: linear-gradient(180deg, #6f7b8c 0%, #4a5463 48%, #363e4a 52%, #2a313b 100%);
+  --btn-border: var(--frame-iron);
+  --btn-color: var(--ivory);
+  --btn-text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+  --btn-shadow: inset 0 1px 0 var(--mithril-hi), 0 2px 6px rgba(0, 0, 0, 0.5);
+  --btn-hover-bg: linear-gradient(180deg, #7d8a9c 0%, #566173 48%, #414a58 52%, #333b47 100%);
+  --btn-hover-shadow: inset 0 1px 0 var(--mithril-hi), 0 0 10px color-mix(in srgb, var(--tint) 60%, transparent);
+  --btn-press-bg: var(--btn-bg);
+  --btn-press-color: var(--ivory);
+  --btn-press-border: var(--frame-iron);
+  --btn-press-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9);
+  --btn-press-move: translateY(1px);
+  --primary-bg: var(--btn-bg);
+  --primary-border: var(--tint);
+  --primary-color: var(--ivory);
+  --primary-text-shadow: var(--btn-text-shadow);
+  --primary-shadow: inset 0 1px 0 var(--mithril-hi), 0 0 10px color-mix(in srgb, var(--tint) 55%, transparent);
+  --primary-hover-bg: var(--btn-hover-bg);
+  --primary-press-bg: var(--btn-bg);
+  --primary-press-color: var(--ivory);
+  --danger-bg: var(--btn-bg);
+  --danger-border: var(--danger);
+  --danger-color: #ff8a9b;
+
+  --card-bg:
+    linear-gradient(var(--mithril-hi), var(--mithril-hi)) top left / 12px 2px no-repeat,
+    linear-gradient(var(--mithril-hi), var(--mithril-hi)) top left / 2px 12px no-repeat,
+    linear-gradient(var(--mithril-hi), var(--mithril-hi)) top right / 12px 2px no-repeat,
+    linear-gradient(var(--mithril-hi), var(--mithril-hi)) top right / 2px 12px no-repeat,
+    linear-gradient(var(--mithril), var(--mithril)) bottom left / 12px 2px no-repeat,
+    linear-gradient(var(--mithril), var(--mithril)) bottom left / 2px 12px no-repeat,
+    linear-gradient(var(--mithril), var(--mithril)) bottom right / 12px 2px no-repeat,
+    linear-gradient(var(--mithril), var(--mithril)) bottom right / 2px 12px no-repeat,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 33%),
+    var(--glass);
+  --card-border: 1px solid var(--frame-iron);
+  --card-radius: 6px;
+  --card-shadow:
+    inset 0 1px 0 var(--mithril-hi),
+    inset 0 0 0 2px color-mix(in srgb, var(--mithril) 70%, transparent),
+    inset 0 0 0 3px var(--frame-iron),
+    inset 0 0 0 4px color-mix(in srgb, var(--tint) 30%, transparent),
+    0 8px 24px var(--shadow-soft);
+  --card-hover-bg: var(--glass);
+
+  --side-bg: linear-gradient(90deg, rgba(14, 17, 22, 0.6), rgba(8, 10, 13, 0.72));
+  --side-border: 1px solid var(--frame-iron);
+  --side-shadow: inset -1px 0 0 color-mix(in srgb, var(--mithril) 45%, transparent);
+  --side-gap: 6px;
+  --side-text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+  --side-item-r: 3px;
+  --side-item-bg: var(--slot-bg);
+  --side-item-border: var(--frame-iron);
+  --side-item-shadow: inset 0 0 0 1px color-mix(in srgb, var(--mithril) 25%, transparent), inset 0 2px 4px rgba(0, 0, 0, 0.6);
+  --side-hover-bg: var(--slot-bg);
+  --side-active-bg: var(--slot-bg);
+  --side-active-color: var(--tint);
+  --side-active-icon: var(--tint);
+  --side-active-border: var(--frame-iron);
+  --side-active-shadow: inset 0 0 0 1px var(--tint), inset 0 0 10px color-mix(in srgb, var(--tint) 45%, transparent), 0 0 8px color-mix(in srgb, var(--tint) 40%, transparent);
+
+  --meter-r: 2px;
+  --meter-track: var(--slot-bg);
+  --meter-track-shadow: inset 0 0 0 1px var(--frame-iron);
+  --meter-fill: linear-gradient(180deg, color-mix(in srgb, var(--tint) 55%, #ffffff), var(--tint) 50%, color-mix(in srgb, var(--tint) 65%, #000000));
+  --meter-fill-shadow: 0 0 8px color-mix(in srgb, var(--tint) 60%, transparent);
+
+  --log-bg: var(--slot-bg);
+  --log-border: 1px solid var(--frame-iron);
+  --bubble-user-bg: var(--slot-bg);
+
+  --modal-r: 4px;
+  --modal-bg: linear-gradient(180deg, #1a2029 0%, #12161c 100%);
+  --modal-border: 1px solid var(--frame-iron);
+  --modal-shadow: 0 0 0 1px var(--mithril), 0 0 0 2px var(--frame-iron), 0 14px 40px rgba(0, 0, 0, 0.7);
+  --modal-head-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent);
+  --modal-head-text: #e6e1d3;
+  --modal-head-border: 1px solid color-mix(in srgb, var(--tint) 30%, transparent);
+  --modal-title-font: var(--font-header);
+  --overlay: rgba(4, 6, 9, 0.7);
+}
+
+:root[data-skin="mmo"][data-theme="light"] {
+  --bar: rgba(239, 233, 218, 0.8);
+  --bar-line: #5b5446;
+  --thumb: #ffffff;
+  --shadow-soft: rgba(60, 50, 30, 0.35);
+  --frame-iron: #5b5446;
+  --mithril: #a39a86;
+  --mithril-hi: #fffaf0;
+  --slot-bg: rgba(230, 223, 205, 0.9);
+  --ivory: #1d1c19;
+  --metal-text: linear-gradient(180deg, #5b5446 0%, #2a261f 100%);
+  --glass: linear-gradient(180deg, rgba(250, 247, 240, 0.95), rgba(232, 225, 208, 0.9));
+  --page: radial-gradient(ellipse at 50% 40%, #ece6d8 0%, #cfc8b7 80%);
+  --seg-text: #4d4a42;
+  --seg-on: linear-gradient(180deg, #fffaf0, #e2d9c5);
+  --seg-on-text: #1d1c19;
+  --field-line: rgba(90, 80, 60, 0.28);
+  --field-shadow: inset 0 1px 2px rgba(60, 50, 30, 0.18);
+  --btn-bg: linear-gradient(180deg, #fffaf0 0%, #e8e0cd 50%, #d6ccb5 52%, #c9bea5 100%);
+  --btn-hover-bg: linear-gradient(180deg, #ffffff 0%, #efe8d7 50%, #ded5bf 52%, #d2c8b0 100%);
+  --btn-text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  --btn-press-shadow: inset 0 2px 4px rgba(60, 50, 30, 0.5);
+  --danger-color: #b01830;
+  --side-bg: linear-gradient(90deg, rgba(240, 234, 220, 0.8), rgba(214, 205, 186, 0.85));
+  --side-text-shadow: none;
+  --side-item-shadow: inset 0 0 0 1px rgba(90, 80, 60, 0.25);
+}
+
+:root[data-skin="mmo"] :is(input[type="text"], input[type="password"], input[type="number"], select, textarea) {
+  background: var(--slot-bg);
+}
+
+/* Titles: serif small caps in a metal gradient with a shadow below. */
+:root[data-skin="mmo"] h1,
+:root[data-skin="mmo"] h2,
+:root[data-skin="mmo"] .card > h3 {
+  font-variant: small-caps;
+  background: var(--metal-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.85));
+}
+
+:root[data-skin="mmo"][data-theme="light"] h1,
+:root[data-skin="mmo"][data-theme="light"] h2,
+:root[data-skin="mmo"][data-theme="light"] .card > h3 {
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.6));
+}
+
+/* Rune crest under section titles: a crystal and wing lines. */
+:root[data-skin="mmo"] .card > h3::after {
+  content: "";
+  display: block;
+  width: 120px;
+  height: 9px;
+  margin-top: 4px;
+  background:
+    linear-gradient(45deg, transparent 38%, var(--tint) 38%, var(--tint) 62%, transparent 62%) center / 9px 9px no-repeat,
+    linear-gradient(90deg, transparent, var(--mithril) 45%, transparent 45%, transparent 55%, var(--mithril) 55%, transparent) center / 100% 1px no-repeat;
+  -webkit-text-fill-color: initial;
+}
+
+:root[data-skin="mmo"] .card {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (hover: hover) {
+  :root[data-skin="mmo"] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button):hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+}
+
+/* The dialog is an iron window in both modes, with its own light-on-dark palette. */
+:root[data-skin="mmo"] .modal {
+  --text: #e6e1d3;
+  --text-2: #b9b2a0;
+  --text-3: #8e8775;
+  --border: rgba(138, 151, 168, 0.32);
+  --surface: #1c232c;
+  --surface-2: #262e38;
+  --field: rgba(8, 10, 13, 0.95);
+  --metal-text: linear-gradient(180deg, #e2e8f0 0%, #a4b0c0 100%);
+  --mithril: #8a97a8;
+  --mithril-hi: #d5dfeb;
+  --frame-iron: #0b0d11;
+  color: var(--text);
+}
+
+:root[data-skin="mmo"] .modal > .modal-head h2 {
+  letter-spacing: 0.04em;
+}

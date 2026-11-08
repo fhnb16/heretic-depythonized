@@ -1,0 +1,30 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Catalog themes. Every rule is scoped to :root[data-skin="<id>"], so loading them all is safe. */
+
+@import url("base.css");
+@import url("aero.css");
+@import url("alloy.css");
+@import url("board.css");
+@import url("bubble.css");
+@import url("ember.css");
+@import url("flat.css");
+@import url("fluent.css");
+@import url("forum.css");
+@import url("frost.css");
+@import url("gloss.css");
+@import url("grid.css");
+@import url("groove.css");
+@import url("honey.css");
+@import url("ink.css");
+@import url("lounge.css");
+@import url("material.css");
+@import url("metro.css");
+@import url("mmo.css");
+@import url("neon.css");
+@import url("olive.css");
+@import url("page.css");
+@import url("patch.css");
+@import url("plain.css");
+@import url("thread.css");
+@import url("vapor.css");
+@import url("wave.css");

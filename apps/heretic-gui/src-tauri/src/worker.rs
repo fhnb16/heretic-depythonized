@@ -44,6 +44,11 @@ pub enum Command {
         private: bool,
         strategy: ExportStrategy,
     },
+    SaveGguf {
+        output: PathBuf,
+        kind: heretic_export::gguf::GgufType,
+        llama_cpp_dir: Option<PathBuf>,
+    },
     ModelCard,
 }
 
@@ -266,6 +271,17 @@ fn run_worker(app: AppHandle, receiver: mpsc::Receiver<Envelope>, flags: Arc<Mut
                     })
                     .map_err(|e| format!("{e:#}"))?;
                 Ok(json!({"repo_id": repo_id}))
+            }),
+
+            Command::SaveGguf {
+                output,
+                kind,
+                llama_cpp_dir,
+            } => require(&mut session).and_then(|session| {
+                let export = session
+                    .save_gguf(&output, kind, llama_cpp_dir.as_deref())
+                    .map_err(|e| format!("{e:#}"))?;
+                Ok(json!({"path": export.path, "bytes": export.bytes, "type": export.kind.name()}))
             }),
 
             Command::ModelCard => require(&mut session)

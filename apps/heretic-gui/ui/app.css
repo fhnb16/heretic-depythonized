@@ -585,6 +585,9 @@ th.num {
   padding: 12px;
   white-space: pre-wrap;
 }
+.error-box.problem { display: grid; gap: 4px; white-space: normal; }
+.error-box.problem p { margin: 0; }
+.error-box.problem .mono { overflow-wrap: anywhere; }
 
 .placeholder {
   padding: 40px 0;
@@ -702,6 +705,51 @@ nav {
 
 .status .row {
   justify-content: space-between;
+}
+
+/* Update notice above the run status, and the update controls in Settings. */
+.update-notice {
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.update-notice .stack > .row,
+.update-notice > .row:first-child {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
+button.small {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+button.link {
+  align-self: flex-start;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--accent-ink);
+  font-weight: 400;
+}
+
+button.link:hover:not(:disabled) {
+  background: transparent;
+  text-decoration: underline;
+}
+
+.bad-text {
+  color: var(--bad);
+  overflow-wrap: anywhere;
+}
+
+.updates {
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 main {
@@ -1396,31 +1444,50 @@ main {
 
 .theme-tile .swatch {
   display: flex;
+  height: 72px;
+}
+
+.theme-tile .swatch-side {
+  display: flex;
   flex-direction: column;
   gap: 4px;
-  height: 64px;
+  width: 28px;
+  padding: 8px 6px;
+  border-right: 1px solid;
+}
+
+.theme-tile .swatch-nav {
+  height: 4px;
+  border-radius: 2px;
+}
+
+.theme-tile .swatch-main {
+  flex: 1;
   padding: 8px;
 }
 
 .theme-tile .swatch-card {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 4px;
-  height: 20px;
-  padding: 0 6px;
+  height: 100%;
+  padding: 6px;
   border: 1px solid;
 }
 
 .theme-tile .swatch-line {
   height: 4px;
   border-radius: 2px;
-  flex: 1;
 }
 
-.theme-tile .swatch-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.theme-tile .swatch-line.short {
+  width: 60%;
+}
+
+.theme-tile .swatch-button {
+  width: 32px;
+  height: 10px;
+  margin-top: auto;
 }
 
 .theme-tile .name {

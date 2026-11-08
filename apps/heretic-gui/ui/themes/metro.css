@@ -1,0 +1,86 @@
+/* Metro: flat tiles without a single radius or shadow, thin large headings, a solid accent block
+   instead of a highlight; buttons have a 2px frame in the text color and invert when pressed. */
+
+:root[data-skin="metro"] {
+  --bar: #1d1d1d;
+  --bar-line: #3a3a3a;
+  --thumb: #ffffff;
+  --shadow-soft: transparent;
+  --chip-r: 0;
+  --hero-size: 40px;
+  --hero-weight: 200;
+  --hero-tracking: -0.02em;
+  --title-weight: 300;
+
+  --sw-w: 44px;
+  --sw-h: 20px;
+  --sw-r: 0;
+  --sw-thumb: 12px;
+  --sw-thumb-r: 0;
+  --sw-pad: 4px;
+  --sw-off: transparent;
+  --sw-shadow: none;
+  --sw-track-shadow: inset 0 0 0 2px var(--sep-strong);
+  --sw-track-shadow-on: inset 0 0 0 2px var(--tint);
+  --thumb-on: var(--on-tint);
+  --seg-r: 0;
+  --seg-text: var(--text);
+
+  --btn-r: 0;
+  --btn-bw: 2px;
+  --btn-border: var(--text);
+  --btn-color: var(--text);
+  --btn-weight: 600;
+  --btn-hover-bg: color-mix(in srgb, var(--text) 10%, transparent);
+  --btn-press-bg: var(--text);
+  --btn-press-color: var(--bg);
+  --btn-press-border: var(--text);
+  --btn-press-move: none;
+  --danger-border: var(--danger);
+
+  --field-r: 0;
+  --card-border: 0;
+  --card-radius: 0;
+
+  --side-item-r: 0;
+  --side-gap: 2px;
+  --side-weight: 300;
+  --side-active-bg: var(--tint);
+  --side-active-color: var(--on-tint);
+  --side-active-icon: var(--on-tint);
+
+  --meter-r: 0;
+  --bubble-r: 0;
+  --bubble-user-bg: var(--tint);
+  --bubble-user-color: var(--on-tint);
+
+  --modal-r: 0;
+  --modal-border: 0;
+  --modal-shadow: none;
+  --modal-head-bg: var(--tint);
+  --modal-head-text: var(--on-tint);
+  --overlay: rgba(0, 0, 0, 0.6);
+}
+
+:root[data-skin="metro"][data-theme="light"] {
+  --bar: #ffffff;
+  --bar-line: #d6d6d6;
+  --thumb: #000000;
+}
+
+:root[data-skin="metro"] input[type="checkbox"]::before {
+  background: var(--text-2);
+}
+
+:root[data-skin="metro"] input[type="checkbox"]:checked::before {
+  background: var(--thumb-on);
+}
+
+:root[data-skin="metro"] .modal > .modal-head h2 {
+  font-size: 22px;
+  font-weight: 300;
+}
+
+:root[data-skin="metro"] .modal > .modal-head button.ghost {
+  border-radius: 0;
+}

@@ -1,0 +1,46 @@
+/* Forum: white cards in a frame on a gray-blue backdrop, bold titles, capsule buttons,
+   dialog header as a section strip. */
+
+:root[data-skin="forum"] {
+  --bar: #ffffff;
+  --bar-line: #edeff1;
+  --shadow-soft: transparent;
+  --chip-r: 999px;
+  --hero-size: 30px;
+  --hero-weight: 700;
+  --title-weight: 700;
+
+  --sw-w: 44px;
+  --sw-h: 24px;
+  --sw-r: 999px;
+  --sw-thumb: 20px;
+  --sw-off: #c9ced1;
+  --seg-r: 999px;
+  --seg-on: var(--text);
+  --seg-on-text: var(--surface);
+
+  --btn-r: 999px;
+  --btn-weight: 700;
+
+  --card-border: 1px solid var(--sep-strong);
+  --card-radius: 8px;
+
+  --side-item-r: 999px;
+
+  --modal-r: 4px;
+  --modal-border: 1px solid var(--sep-strong);
+  --modal-head-bg: linear-gradient(180deg, color-mix(in srgb, var(--tint) 80%, #ffffff), var(--tint));
+  --modal-head-text: var(--on-tint);
+  --modal-head-border: 1px solid color-mix(in srgb, var(--tint) 70%, #000000);
+}
+
+:root[data-skin="forum"][data-theme="dark"] {
+  --bar: #1a1a1b;
+  --bar-line: #343536;
+  --sw-off: #474748;
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-skin="forum"] .modal > .modal-head h2 {
+  font-size: 15px;
+}

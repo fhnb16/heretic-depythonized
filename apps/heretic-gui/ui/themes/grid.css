@@ -1,0 +1,96 @@
+/* GRiD: monochrome plasma terminal. Monospace, zero radii, solid panels, every color derived
+   from the accent; selection is an inverted row instead of a colored mark. */
+
+:root[data-skin="grid"] {
+  --bar: color-mix(in srgb, var(--tint) 4%, #050505);
+  --bar-line: color-mix(in srgb, var(--tint) 42%, #050505);
+  --thumb: var(--tint);
+  --on-danger: #050505;
+  --shadow-soft: transparent;
+  --chip-r: 0;
+  --hero-size: 26px;
+  --hero-weight: 400;
+  --hero-tracking: 0.04em;
+  --hero-transform: uppercase;
+  --title-weight: 400;
+  --title-transform: uppercase;
+  --title-tracking: 0.08em;
+
+  --sw-w: 44px;
+  --sw-r: 0;
+  --sw-thumb: 16px;
+  --sw-thumb-r: 0;
+  --sw-pad: 3px;
+  --sw-off: transparent;
+  --sw-on: transparent;
+  --sw-shadow: none;
+  --sw-track-shadow: inset 0 0 0 1px var(--sep-strong);
+  --sw-track-shadow-on: inset 0 0 0 1px var(--tint);
+  --thumb-on: var(--tint);
+  --seg-r: 0;
+  --seg-text: var(--text);
+
+  --btn-r: 0;
+  --field-r: 0;
+  --card-radius: 0;
+  --card-shadow: 0 0 #0000;
+
+  --side-item-r: 0;
+  --side-transform: uppercase;
+  --side-tracking: 0.08em;
+  --side-hover-bg: var(--surface-press);
+  --side-active-bg: var(--tint);
+  --side-active-color: var(--on-tint);
+  --side-active-icon: var(--on-tint);
+
+  --meter-r: 0;
+  --log-border: 1px solid var(--sep);
+  --bubble-r: 0;
+  --bubble-user-bg: transparent;
+  --th-transform: uppercase;
+  --th-tracking: 0.08em;
+
+  --modal-r: 0;
+  --modal-border: 1px solid var(--tint);
+  --modal-shadow: none;
+  --modal-head-bg: var(--tint);
+  --modal-head-text: var(--bg);
+  --overlay: rgba(0, 0, 0, 0.72);
+}
+
+:root[data-skin="grid"][data-theme="light"] {
+  --bar: color-mix(in srgb, var(--tint) 7%, #fbfaf6);
+  --bar-line: color-mix(in srgb, var(--tint) 50%, #ffffff);
+  --thumb: color-mix(in srgb, var(--tint) 45%, #000000);
+  --thumb-on: color-mix(in srgb, var(--tint) 45%, #000000);
+  --side-active-bg: color-mix(in srgb, var(--tint) 45%, #000000);
+  --side-active-color: #ffffff;
+  --side-active-icon: #ffffff;
+}
+
+:root[data-skin="grid"] input[type="checkbox"]::before {
+  background: var(--text-3);
+}
+
+:root[data-skin="grid"] input[type="checkbox"]:checked::before {
+  background: var(--thumb-on);
+}
+
+:root[data-skin="grid"] .bubble.user {
+  border: 1px solid var(--sep-strong);
+}
+
+:root[data-skin="grid"] .modal > .modal-head h2 {
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+:root[data-skin="grid"] .modal > .modal-head button.ghost {
+  border-radius: 0;
+}
+
+:root[data-skin="grid"] .modal > .modal-foot {
+  padding-top: 16px;
+  border-top: 1px dashed var(--tint);
+}

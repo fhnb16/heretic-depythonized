@@ -8,6 +8,7 @@
 //! shared flags, because the worker is busy while a run is in progress. Log messages,
 //! progress and session events are forwarded to the frontend as Tauri events.
 
+mod update;
 mod worker;
 
 use std::path::{Path, PathBuf};
@@ -181,18 +182,71 @@ struct ModelInspection {
     /// Total size of the safetensors weights in bytes, if known.
     weights_bytes: Option<u64>,
     has_chat_template: bool,
+    /// Why the model can't be used, as a code the frontend explains (`problem*` i18n keys):
+    /// gguf, file, missing_path, no_config, bad_config, hub_not_found, hub_gated, hub_error,
+    /// no_weights, bin_only, gguf_only, no_chat_template, unsupported.
+    problem: Option<String>,
+}
+
+impl ModelInspection {
+    fn problem(id: String, code: &str, message: impl Into<String>) -> Self {
+        ModelInspection {
+            id,
+            supported: false,
+            message: Some(message.into()),
+            model_type: None,
+            architectures: Vec::new(),
+            layers: None,
+            multimodal: false,
+            checkpoint_dtype: None,
+            weights_bytes: None,
+            has_chat_template: false,
+            problem: Some(code.into()),
+        }
+    }
+}
+
+/// Classifies a Hugging Face Hub error by the status in its message.
+fn hub_problem(error: &anyhow::Error) -> &'static str {
+    let text = format!("{error:#}");
+    if text.contains("(404)") || text.contains("Repo id must be") || text.contains("Invalid repo id") {
+        "hub_not_found"
+    } else if text.contains("(401)") || text.contains("(403)") {
+        "hub_gated"
+    } else {
+        "hub_error"
+    }
 }
 
 /// Checks whether a model (Hub ID or local path) is supported, and estimates its size.
 #[tauri::command]
 async fn inspect_model(id: String) -> CommandResult<ModelInspection> {
     tauri::async_runtime::spawn_blocking(move || -> CommandResult<ModelInspection> {
-        let id = id.trim().to_string();
+        let id = id.trim().trim_matches('"').to_string();
         let local = Path::new(&id);
+        let looks_like_path = id.contains('\\') || id.contains(':') || id.starts_with('/') || id.starts_with('.');
+        let is_gguf = |name: &str| name.to_ascii_lowercase().ends_with(".gguf");
+
+        if local.is_file() {
+            return Ok(if is_gguf(&id) {
+                ModelInspection::problem(id.clone(), "gguf", format!("{} is a GGUF file", local.display()))
+            } else {
+                ModelInspection::problem(
+                    id.clone(),
+                    "file",
+                    format!("{} is a file, not a folder", local.display()),
+                )
+            });
+        }
+        if !local.is_dir() && looks_like_path {
+            return Ok(ModelInspection::problem(
+                id.clone(),
+                "missing_path",
+                format!("{} does not exist", local.display()),
+            ));
+        }
 
         let (config_text, weights_bytes, files): (String, Option<u64>, Vec<String>) = if local.is_dir() {
-            let config =
-                std::fs::read_to_string(local.join("config.json")).map_err(|_| "config.json not found".to_string())?;
             let mut total = 0u64;
             let mut files = Vec::new();
             for entry in std::fs::read_dir(local).map_err(error_string)? {
@@ -203,9 +257,35 @@ async fn inspect_model(id: String) -> CommandResult<ModelInspection> {
                 }
                 files.push(name);
             }
+            let config = match std::fs::read_to_string(local.join("config.json")) {
+                Ok(config) => config,
+                Err(_) if files.iter().any(|f| is_gguf(f)) => {
+                    return Ok(ModelInspection::problem(
+                        id.clone(),
+                        "gguf_only",
+                        format!("{} contains GGUF files but no config.json", local.display()),
+                    ));
+                }
+                Err(_) => {
+                    return Ok(ModelInspection::problem(
+                        id.clone(),
+                        "no_config",
+                        format!("config.json not found in {}", local.display()),
+                    ));
+                }
+            };
             (config, Some(total), files)
         } else {
-            let info = hub::repo_info(RepoType::Model, &id, None).map_err(|e| format!("{e:#}"))?;
+            let info = match hub::repo_info(RepoType::Model, &id, None) {
+                Ok(info) => info,
+                Err(error) => {
+                    return Ok(ModelInspection::problem(
+                        id.clone(),
+                        hub_problem(&error),
+                        format!("{error:#}"),
+                    ));
+                }
+            };
             let weights: u64 = info
                 .siblings
                 .iter()
@@ -213,8 +293,28 @@ async fn inspect_model(id: String) -> CommandResult<ModelInspection> {
                 .filter_map(|s| s.size.or(s.lfs.as_ref().and_then(|l| l.size)))
                 .sum();
             let files: Vec<String> = info.siblings.iter().map(|s| s.rfilename.clone()).collect();
-            let path = hub::download(RepoType::Model, &id, Some(&info.sha), "config.json", None)
-                .map_err(|e| format!("{e:#}"))?;
+            if !files.iter().any(|f| f == "config.json") {
+                let code = if files.iter().any(|f| is_gguf(f)) {
+                    "gguf_only"
+                } else {
+                    "no_config"
+                };
+                return Ok(ModelInspection::problem(
+                    id.clone(),
+                    code,
+                    format!("{id} has no config.json"),
+                ));
+            }
+            let path = match hub::download(RepoType::Model, &id, Some(&info.sha), "config.json", None) {
+                Ok(path) => path,
+                Err(error) => {
+                    return Ok(ModelInspection::problem(
+                        id.clone(),
+                        hub_problem(&error),
+                        format!("{error:#}"),
+                    ));
+                }
+            };
             (
                 std::fs::read_to_string(path).map_err(error_string)?,
                 (weights > 0).then_some(weights),
@@ -222,7 +322,16 @@ async fn inspect_model(id: String) -> CommandResult<ModelInspection> {
             )
         };
 
-        let config: Value = serde_json::from_str(&config_text).map_err(error_string)?;
+        let config: Value = match serde_json::from_str(&config_text) {
+            Ok(config) => config,
+            Err(error) => {
+                return Ok(ModelInspection::problem(
+                    id.clone(),
+                    "bad_config",
+                    format!("config.json: {error}"),
+                ));
+            }
+        };
         let text = heretic_engine::config::text_config_json(&config);
         let architectures = config
             .get("architectures")
@@ -233,18 +342,31 @@ async fn inspect_model(id: String) -> CommandResult<ModelInspection> {
         let parsed = heretic_engine::config::TextConfig::from_json(&config);
         let has_chat_template = files
             .iter()
-            .any(|f| f == "chat_template.jinja" || f == "tokenizer_config.json");
+            .any(|f| f == "chat_template.jinja" || f == "chat_template.json" || f == "tokenizer_config.json");
+        let has_safetensors = files.iter().any(|f| f.ends_with(".safetensors"));
+        let has_bin = files
+            .iter()
+            .any(|f| f.ends_with(".bin") || f.ends_with(".pt") || f.ends_with(".pth"));
+
+        let (problem, message): (Option<&str>, Option<String>) = match &parsed {
+            Err(error) => (Some("unsupported"), Some(format!("{error:#}"))),
+            Ok(_) if !has_safetensors && has_bin => (Some("bin_only"), Some("Only PyTorch .bin weights".into())),
+            Ok(_) if !has_safetensors && files.iter().any(|f| is_gguf(f)) => {
+                (Some("gguf_only"), Some("Only GGUF weights".into()))
+            }
+            Ok(_) if !has_safetensors => (Some("no_weights"), Some("No safetensors weights".into())),
+            Ok(_) if !has_chat_template => (
+                Some("no_chat_template"),
+                Some("No chat_template.jinja or tokenizer_config.json".into()),
+            ),
+            Ok(_) => (None, None),
+        };
 
         Ok(ModelInspection {
             id,
-            supported: parsed.is_ok() && files.iter().any(|f| f.ends_with(".safetensors")),
-            message: match &parsed {
-                Err(error) => Some(format!("{error:#}")),
-                Ok(_) if !files.iter().any(|f| f.ends_with(".safetensors")) => {
-                    Some("The model has no safetensors weights".into())
-                }
-                Ok(_) => None,
-            },
+            supported: problem.is_none(),
+            problem: problem.map(String::from),
+            message,
             model_type: text.get("model_type").and_then(Value::as_str).map(String::from),
             architectures,
             layers: text
@@ -415,6 +537,50 @@ async fn save_model(state: State<'_, AppState>, directory: String, strategy: Str
         .await
 }
 
+// ---------------------------------------------------------------- GGUF export (llama.cpp)
+
+/// Saves the model with the applied trial as GGUF. `directory` is a folder or a `.gguf` file.
+#[tauri::command]
+async fn save_gguf(
+    state: State<'_, AppState>,
+    directory: String,
+    gguf_type: String,
+    llama_cpp_dir: Option<String>,
+) -> CommandResult<Value> {
+    let kind = heretic_export::gguf::GgufType::parse(&gguf_type).map_err(|e| format!("{e:#}"))?;
+    state
+        .worker
+        .request(Command::SaveGguf {
+            output: PathBuf::from(directory),
+            kind,
+            llama_cpp_dir: llama_cpp_dir
+                .map(|d| d.trim().to_string())
+                .filter(|d| !d.is_empty())
+                .map(PathBuf::from),
+        })
+        .await
+}
+
+/// Checks a llama.cpp folder: whether llama-quantize is there and runs, and its version.
+#[tauri::command]
+async fn check_llama_cpp(directory: String) -> CommandResult<Value> {
+    tauri::async_runtime::spawn_blocking(move || {
+        let result = heretic_export::gguf::LlamaCpp::locate(Path::new(directory.trim()))
+            .and_then(|llama_cpp| llama_cpp.check().map(|_| llama_cpp));
+        Ok(match result {
+            Ok(llama_cpp) => json!({
+                "ok": true,
+                "directory": llama_cpp.directory,
+                "quantize": llama_cpp.quantize,
+                "version": llama_cpp.version,
+            }),
+            Err(error) => json!({"ok": false, "error": format!("{error:#}")}),
+        })
+    })
+    .await
+    .map_err(error_string)?
+}
+
 fn parse_strategy(strategy: &str) -> CommandResult<heretic_core::config::ExportStrategy> {
     match strategy {
         "merge" => Ok(heretic_core::config::ExportStrategy::Merge),
@@ -488,6 +654,37 @@ fn forget_token(state: State<AppState>) {
     *state.hf_token.lock().unwrap() = None;
 }
 
+// ---------- Updates (see update.rs) ----------
+
+/// Version of this build, including the build number of pre-release builds.
+#[tauri::command]
+fn update_current_version() -> &'static str {
+    update::current_version()
+}
+
+/// Looks for a newer release on GitHub.
+#[tauri::command]
+async fn check_update(include_prereleases: bool) -> CommandResult<update::UpdateCheck> {
+    tauri::async_runtime::spawn_blocking(move || update::check(include_prereleases))
+        .await
+        .map_err(error_string)?
+}
+
+/// Downloads and starts the update (or opens the release page). Progress: `heretic://update`.
+#[tauri::command]
+async fn install_update(app: AppHandle, request: update::InstallRequest) -> CommandResult<update::InstallOutcome> {
+    tauri::async_runtime::spawn_blocking(move || update::install(&app, request))
+        .await
+        .map_err(error_string)?
+}
+
+#[tauri::command]
+fn open_release_page(url: String) -> CommandResult<()> {
+    update::open_url(&url)
+}
+
+// ---------- End of updates ----------
+
 pub(crate) fn emit(app: &AppHandle, event: &str, payload: Value) {
     let _ = app.emit(event, payload);
 }
@@ -529,10 +726,16 @@ pub fn run() {
             chat_send,
             chat_stop,
             save_model,
+            save_gguf,
+            check_llama_cpp,
             hf_whoami,
             upload_model,
             model_card_preview,
             forget_token,
+            update_current_version,
+            check_update,
+            install_update,
+            open_release_page,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Heretic");

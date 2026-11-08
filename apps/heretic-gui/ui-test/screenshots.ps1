@@ -2,7 +2,7 @@
 # and reports JavaScript errors.
 # Usage: pwsh apps/heretic-gui/ui-test/screenshots.ps1 [-Scenarios home,run] [-Lang ru] [-Theme light] [-Skin heretic] [-Out target/ui-shots]
 param(
-    [string[]]$Scenarios = @("home", "new", "goal", "params", "run", "results", "chat", "export", "settings", "failed"),
+    [string[]]$Scenarios = @("home", "new", "gguf", "goal", "params", "run", "results", "chat", "export", "savegguf", "settings", "failed", "update", "updating", "about"),
     [string]$Lang = "ru",
     [string]$Theme = "light",
     [string]$Skin = "heretic",
@@ -32,6 +32,11 @@ $server = Start-Job -ArgumentList $root.Path, $Port, $Out -ScriptBlock {
     while ($listener.IsListening) {
         $context = $listener.GetContext()
         $request = $context.Request
+        if ($request.Url.AbsolutePath -eq "/__quit") {
+            $context.Response.Close()
+            $listener.Stop()
+            break
+        }
         if ($request.Url.AbsolutePath -eq "/__report") {
             $reader = [System.IO.StreamReader]::new($request.InputStream)
             $body = $reader.ReadToEnd()
@@ -60,12 +65,19 @@ try {
         Remove-Item $report -ErrorAction SilentlyContinue
         $url = "http://localhost:$Port/ui-test/index.html?scenario=$scenario&lang=$Lang&theme=$Theme&skin=$Skin"
         $png = Join-Path $Out "$scenario-$Lang-$Theme-$Skin.png"
+        Remove-Item $png -ErrorAction SilentlyContinue
         $userData = Join-Path $Out ".edge-profile"
         $process = Start-Process -FilePath $edge -PassThru -WindowStyle Hidden -ArgumentList @(
             "--headless=new", "--disable-gpu", "--no-first-run", "--user-data-dir=`"$userData`"",
             "--window-size=1280,860", "--virtual-time-budget=15000", "--screenshot=`"$png`"", $url
         )
-        $process.WaitForExit(60000) | Out-Null
+        # Newer Edge launchers return at once and render in a child process, so wait for the
+        # report and the screenshot themselves rather than for the launcher to exit.
+        $deadline = (Get-Date).AddSeconds(60)
+        while ((Get-Date) -lt $deadline -and -not ((Test-Path $report) -and (Test-Path $png))) {
+            Start-Sleep -Milliseconds 250
+        }
+        $process.WaitForExit(5000) | Out-Null
 
         if (-not (Test-Path $report)) {
             Write-Host "$scenario`: no report (scenario did not finish)" -ForegroundColor Yellow
@@ -82,6 +94,9 @@ try {
         }
     }
 } finally {
+    # GetContext() blocks, so Stop-Job alone would wait about two minutes for the listener.
+    try { Invoke-WebRequest "http://localhost:$Port/__quit" -TimeoutSec 3 | Out-Null } catch {}
+    Wait-Job $server -Timeout 5 | Out-Null
     Stop-Job $server -ErrorAction SilentlyContinue
     Remove-Job $server -Force -ErrorAction SilentlyContinue
 }

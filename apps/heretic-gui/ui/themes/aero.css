@@ -1,0 +1,132 @@
+/* Aero: glass windows on a blue desktop. White panels with a light-blue frame, a glass title
+   with glowing text, a dark glass taskbar (here: the sidebar) with a glowing selected button,
+   gray gloss buttons with a break in the middle. */
+
+:root[data-skin="aero"] {
+  --bar: rgba(160, 194, 232, 0.78);
+  --bar-line: rgba(30, 70, 120, 0.6);
+  --shadow-soft: rgba(10, 35, 70, 0.4);
+  --chip-r: 3px;
+  --page:
+    radial-gradient(ellipse at 25% -10%, rgba(255, 255, 255, 0.45), transparent 55%),
+    radial-gradient(ellipse at 90% 110%, rgba(120, 200, 255, 0.35), transparent 50%),
+    linear-gradient(165deg, #1b5a9c 0%, #3a86d0 48%, #6fb0ea 100%);
+  --hero-size: 30px;
+  --hero-weight: 300;
+  --on-page: #ffffff;
+  --on-page-2: rgba(255, 255, 255, 0.86);
+  --on-page-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+
+  --sw-w: 46px;
+  --sw-r: 3px;
+  --sw-thumb-r: 2px;
+  --sw-off: linear-gradient(#dcdcdc, #f4f4f4);
+  --sw-on: linear-gradient(color-mix(in srgb, var(--tint) 70%, #ffffff), var(--tint));
+  --sw-shadow: 0 0 0 1px #707070;
+  --thumb: linear-gradient(#ffffff, #d6d6d6);
+  --sw-track-shadow: inset 0 0 0 1px #707070;
+  --sw-track-shadow-on: inset 0 0 0 1px color-mix(in srgb, var(--tint) 70%, #000000);
+
+  --seg-r: 3px;
+  --seg-line: #707070;
+  --seg-text: #1e1e1e;
+  --seg-item-bg: linear-gradient(#f2f2f2 0%, #ebebeb 49%, #dddddd 50%, #cfcfcf 100%);
+  --seg-item-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+  --seg-on: linear-gradient(color-mix(in srgb, var(--tint) 10%, #ffffff) 0%, color-mix(in srgb, var(--tint) 24%, #ffffff) 49%, color-mix(in srgb, var(--tint) 44%, #ffffff) 50%, color-mix(in srgb, var(--tint) 62%, #ffffff) 100%);
+  --seg-on-text: #1e1e1e;
+
+  --btn-r: 3px;
+  --btn-bg: linear-gradient(#f2f2f2 0%, #ebebeb 49%, #dddddd 50%, #cfcfcf 100%);
+  --btn-border: #707070;
+  --btn-color: #1e1e1e;
+  --btn-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+  --btn-weight: 400;
+  --btn-hover-bg: linear-gradient(color-mix(in srgb, var(--tint) 6%, #ffffff) 0%, color-mix(in srgb, var(--tint) 12%, #ffffff) 49%, color-mix(in srgb, var(--tint) 24%, #ffffff) 50%, color-mix(in srgb, var(--tint) 34%, #ffffff) 100%);
+  --btn-hover-border: color-mix(in srgb, var(--tint) 60%, #000000);
+  --btn-press-bg: linear-gradient(color-mix(in srgb, var(--tint) 10%, #ffffff) 0%, color-mix(in srgb, var(--tint) 24%, #ffffff) 49%, color-mix(in srgb, var(--tint) 44%, #ffffff) 50%, color-mix(in srgb, var(--tint) 62%, #ffffff) 100%);
+  --btn-press-color: #1e1e1e;
+  --btn-press-border: color-mix(in srgb, var(--tint) 55%, #000000);
+  --btn-press-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+  --btn-press-move: none;
+  --primary-bg: linear-gradient(color-mix(in srgb, var(--tint) 8%, #ffffff) 0%, color-mix(in srgb, var(--tint) 14%, #ffffff) 49%, color-mix(in srgb, var(--tint) 27%, #ffffff) 50%, color-mix(in srgb, var(--tint) 38%, #ffffff) 100%);
+  --primary-border: color-mix(in srgb, var(--tint) 70%, #000000);
+  --primary-color: #1e1e1e;
+  --primary-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 4px color-mix(in srgb, var(--tint) 55%, transparent);
+  --primary-hover-bg: var(--btn-press-bg);
+  --primary-press-bg: var(--btn-press-bg);
+  --danger-bg: var(--btn-bg);
+  --danger-border: #707070;
+  --danger-color: #b3261e;
+
+  --card-border: 1px solid var(--sep-strong);
+  --card-radius: 6px;
+  --card-shadow: 0 3px 10px var(--shadow-soft), inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+
+  /* The taskbar becomes the sidebar: dark glass, the selected button glows. */
+  --side-bg:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0.1) 51%),
+    rgba(16, 30, 48, 0.86);
+  --side-border: 1px solid rgba(0, 0, 0, 0.6);
+  --side-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.28);
+  --side-brand: #ffffff;
+  --side-text: rgba(255, 255, 255, 0.78);
+  --side-item-r: 3px;
+  --side-hover-bg: rgba(255, 255, 255, 0.1);
+  --side-hover-color: #ffffff;
+  --side-active-bg:
+    radial-gradient(ellipse at 0% 50%, color-mix(in srgb, var(--tint) 85%, #ffffff) 0%, transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.06));
+  --side-active-border: rgba(255, 255, 255, 0.4);
+  --side-active-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 0 10px color-mix(in srgb, var(--tint) 65%, transparent);
+  --side-active-color: #ffffff;
+  --side-active-icon: #ffffff;
+
+  --meter-track: linear-gradient(#dcdcdc, #f4f4f4);
+  --meter-track-shadow: inset 0 0 0 1px #8fb0d6;
+  --meter-fill: linear-gradient(color-mix(in srgb, #3fc43f 70%, #ffffff), #2c9e2c);
+
+  --modal-r: 8px;
+  --modal-border: 1px solid rgba(0, 0, 0, 0.45);
+  --modal-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset, 0 12px 36px rgba(0, 0, 0, 0.45);
+  --modal-head-bg: linear-gradient(180deg, color-mix(in srgb, var(--tint) 30%, #ffffff) 0%, color-mix(in srgb, var(--tint) 55%, #ffffff) 48%, color-mix(in srgb, var(--tint) 70%, #000000) 52%, color-mix(in srgb, var(--tint) 85%, #ffffff) 100%);
+  --modal-head-text: #ffffff;
+  --modal-head-border: 1px solid rgba(0, 0, 0, 0.35);
+}
+
+:root[data-skin="aero"][data-theme="dark"] {
+  --bar: rgba(30, 58, 92, 0.78);
+  --bar-line: rgba(120, 170, 220, 0.4);
+  --page:
+    radial-gradient(ellipse at 25% -10%, rgba(120, 180, 255, 0.25), transparent 55%),
+    linear-gradient(165deg, #06162a 0%, #0f2f55 50%, #164576 100%);
+  --on-page-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  --thumb: linear-gradient(#eaf2fb, #b9c8d8);
+  --meter-track: #0d2440;
+  --meter-track-shadow: inset 0 0 0 1px #3f6a98;
+}
+
+:root[data-skin="aero"] .modal > .modal-head h2 {
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7), 0 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Labels lying directly on the desktop are white with a shadow, like icon captions. */
+:root[data-skin="aero"] .tabs .tab,
+:root[data-skin="aero"] .tabs .tab.active,
+:root[data-skin="aero"] .chat > .row .muted,
+:root[data-skin="aero"] .chat > .system summary,
+:root[data-skin="aero"] .composer-hint,
+:root[data-skin="aero"] .settings > .faint {
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+:root[data-skin="aero"] .tab .num {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+:root[data-skin="aero"] .tab.active .num {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: #1b5a9c;
+  text-shadow: none;
+}

@@ -1,0 +1,56 @@
+/* Ember: black background, dark gray plates, the orange accent as a fill with dark text,
+   bold headings. */
+
+:root[data-skin="ember"] {
+  --bar: #000000;
+  --bar-line: #1b1b1b;
+  --on-danger: #000000;
+  --shadow-soft: transparent;
+  --chip-r: 4px;
+  --hero-size: 30px;
+  --hero-weight: 700;
+  --title-weight: 700;
+
+  --sw-w: 44px;
+  --sw-r: 4px;
+  --sw-thumb: 16px;
+  --sw-thumb-r: 3px;
+  --sw-pad: 3px;
+  --sw-off: #333333;
+  --sw-shadow: none;
+  --seg-r: 4px;
+  --seg-line: #333333;
+  --seg-on-text: #000000;
+  --seg-weight: 700;
+
+  --btn-r: 4px;
+  --btn-weight: 700;
+  --btn-press-color: #000000;
+  --primary-color: #000000;
+  --primary-hover-color: #000000;
+  --primary-press-color: #000000;
+
+  --card-border: 0;
+  --card-radius: 4px;
+
+  --side-active-bg: transparent;
+  --side-active-color: var(--tint);
+  --side-active-icon: var(--tint);
+  --side-weight: 700;
+
+  --bubble-user-bg: var(--tint);
+  --bubble-user-color: #000000;
+
+  --modal-head-bg: linear-gradient(90deg, var(--tint), var(--companion));
+  --modal-head-text: #000000;
+  --modal-shadow: 0 16px 48px color-mix(in srgb, var(--tint) 30%, rgba(0, 0, 0, 0.5));
+}
+
+:root[data-skin="ember"][data-theme="light"] {
+  --bar: #ffffff;
+  --bar-line: #eeeeee;
+  --sw-off: #d0d0d0;
+  --seg-line: #d0d0d0;
+  --side-active-color: color-mix(in srgb, var(--tint) 50%, #000000);
+  --side-active-icon: color-mix(in srgb, var(--tint) 50%, #000000);
+}

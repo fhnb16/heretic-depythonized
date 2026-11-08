@@ -44,6 +44,7 @@ pub const EXCLUDED_FIELDS: &[&str] = &[
     "benchmarks",
     "save_directory",
     "upload_repo_id",
+    "llama_cpp_dir",
 ];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema, Default)]
@@ -450,6 +451,17 @@ pub struct Settings {
     #[serde(default)]
     pub export_strategy: Option<ExportStrategy>,
 
+    /// Folder of a llama.cpp build that contains llama-quantize, used to quantize models
+    /// saved as GGUF (https://github.com/ggml-org/llama.cpp/releases).
+    #[serde(default)]
+    pub llama_cpp_dir: Option<String>,
+
+    /// Type of models saved as GGUF: "F16", "BF16", "Q8_0", "Q6_K", "Q5_K_M", "Q5_K_S",
+    /// "Q4_K_M", "Q4_K_S", "Q4_0", "Q3_K_M", "Q2_K", or unset to prompt the user.
+    /// All types except F16 and BF16 need llama_cpp_dir.
+    #[serde(default)]
+    pub gguf_type: Option<String>,
+
     /// Action to take in case a checkpoint exists: "continue", "restart", or unset to prompt the user.
     #[serde(default)]
     pub checkpoint_action: Option<String>,
@@ -462,7 +474,8 @@ pub struct Settings {
     #[serde(default)]
     pub n_additional_trials: Option<usize>,
 
-    /// Action to take with the modified model: "save", "upload", or unset to prompt the user.
+    /// Action to take with the modified model: "save", "gguf" (save as GGUF), "upload",
+    /// or unset to prompt the user.
     #[serde(default)]
     pub model_action: Option<String>,
 

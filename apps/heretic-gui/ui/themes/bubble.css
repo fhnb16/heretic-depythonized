@@ -1,0 +1,57 @@
+/* Bubble: a messenger. Header filled with the accent, every message a bubble with a small radius
+   in its bottom corner over a calm chat background. */
+
+:root[data-skin="bubble"] {
+  --bar: #ffffff;
+  --bar-line: #dfe5ea;
+  --shadow-soft: rgba(0, 0, 0, 0.12);
+  --chip-r: 12px;
+  --hero-size: 26px;
+  --hero-weight: 600;
+
+  --sw-off: #b8c1ca;
+  --sw-thumb: 16px;
+  --sw-pad: 3px;
+  --sw-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --seg-r: 8px;
+  --seg-text: var(--tint-text);
+
+  --btn-r: 8px;
+  --btn-press-move: none;
+
+  --card-border: 0;
+  --card-radius: 14px;
+  --card-shadow: 0 1px 1px var(--shadow-soft);
+
+  --bubble-r: 14px;
+  --bubble-user-bg: var(--tint);
+  --bubble-user-color: var(--on-tint);
+  --bubble-user-r: 14px 14px 4px 14px;
+  --bubble-assistant-r: 14px 14px 14px 4px;
+
+  --modal-r: 26px;
+}
+
+:root[data-skin="bubble"][data-theme="dark"] {
+  --bar: #17212b;
+  --bar-line: #0b121a;
+  --sw-off: #3b4a5a;
+  --shadow-soft: rgba(0, 0, 0, 0.35);
+}
+
+/* The accent-filled header: here the brand row on top of the sidebar. */
+:root[data-skin="bubble"][data-theme="light"] .brand {
+  margin: -16px -12px 16px;
+  height: 56px;
+  padding: 0 24px;
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+:root[data-skin="bubble"][data-theme="light"] .brand .icon {
+  color: var(--on-tint);
+}
+
+:root[data-skin="bubble"] .modal > .modal-head h2 {
+  text-align: center;
+}

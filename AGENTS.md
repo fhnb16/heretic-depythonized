@@ -85,22 +85,38 @@ and look at the images, light and dark.
 
 ### Themes
 
-`ui/js/themes.js` ports the 26 themes of the theme catalog at the token level: palette of both
-modes, font, radii and accent. Layout and components stay the app's own; decorations the catalog
-draws with extra CSS (gloss, bevels, glows, blurred glass) are intentionally not ported.
+The 26 themes of the theme catalog are ported completely: tokens and the decorations each theme
+draws (gloss and bevels, Win98 frames, glass, MMO frames, terminal inversion, sidebar indicators,
+switch and segment shapes, dialog title bars), mapped onto the app's own components.
 
-* Palette per mode: `[bg, surface, surface-press, separator, separator-strong, text, text-2,
-  text-3, danger, ok]`. Optional: `accentLight`/`accentDark`, `display` (heading font),
-  `rb` (button radius, e.g. 999 for pills), `solid` (opaque surface for dialogs when surfaces
-  are translucent), `field` (input background).
+* `ui/js/themes.js` holds what JS needs: palette of both modes, font, radii, accent and companion
+  color, a sidebar color for the preview tile. Palette per mode: `[bg, surface, surface-press,
+  separator, separator-strong, text, text-2, text-3, danger, ok]`. Optional: `accentLight`/
+  `accentDark`, `companion`/`companionLight`/`companionDark`, `display` (heading font), `rb`
+  (button radius), `solid` (opaque surface under translucent ones), `field` (input background),
+  `side` (sidebar color of the preview tile). These become inline variables on `<html>`.
 * `themeVariables(id, dark)` derives the accent like the catalog's `applyTheme`: in dark mode
   the accent is mixed with 18% white, the hover shade with 18% black (light) or 22% white (dark),
-  the soft tint is the accent at 14%/24% alpha, text on the accent is whichever of
-  `#101010`/`#ffffff` contrasts more, and `--accent-ink` (accent used as text) is darkened
-  toward the text color until it reaches 4.5:1 on the surface.
+  the soft tint is the accent at 14%/24% alpha, text on the accent is `#101010` when the accent's
+  luminance is above 0.5 and `#ffffff` otherwise, and `--companion` is the catalog's second color
+  (the passport value, otherwise the accent's hue + 38°; grid/board derive it from the accent).
+  The app's `--warn` stays semantic amber. `--accent-ink` (accent used as text) is darkened toward
+  the text color until it reaches 4.5:1 on the surface.
+* `store.applyTheme()` sets `<html data-skin="<id>" data-theme="light|dark">`; the app's own
+  theme has no `data-skin`. `ui/themes/index.css` imports `base.css` and one `<id>.css` per theme,
+  all scoped to `:root[data-skin="<id>"]` (dark mode: `[data-theme="dark"]`).
+* `ui/themes/base.css` aliases the catalog's token names (`--tint`, `--sep`, `--surface-press`,
+  …) and maps component tokens onto the app: `--btn-*`/`--primary-*`/`--danger-*` (action
+  buttons), `--seg-*`, `--sw-*` (checkboxes are drawn as switches), `--field-*`, `--card-*`,
+  `--side-*` (the sidebar, the catalog's desktop tab bar), `--meter-*`, `--modal-*`, `--hero-*`,
+  `--title-*`, `--bubble-*`, `--page` (page background, gradients allowed). A theme file sets
+  those tokens like the catalog does and adds rules only where tokens can't express it. Palette
+  variables come from JS inline and can't be overridden in a theme file.
 * The default theme `heretic` is defined in `app.css` itself and is the one that follows the
-  design direction below. Catalog themes are user choices; keep them readable, not on-brand.
-* Adding a theme: append an entry to `THEMES`, then check `-Skin <id>` screenshots in both modes.
+  design direction below. Catalog themes are user choices; keep them readable and faithful to the
+  catalog, not on-brand.
+* Adding a theme: append an entry to `THEMES`, add `ui/themes/<id>.css` and its `@import`, then
+  check `-Skin <id>` screenshots in both modes.
 
 ## UI design rules
 

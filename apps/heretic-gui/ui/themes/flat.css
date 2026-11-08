@@ -1,0 +1,56 @@
+/* Flat: iOS 7. Buttons are plain accent-colored text without a frame, pressing dims them;
+   only the main action is filled. Thin large titles, full-width grouped lists. */
+
+:root[data-skin="flat"] {
+  --bar: rgba(247, 247, 247, 0.84);
+  --bar-line: rgba(0, 0, 0, 0.22);
+  --shadow-soft: rgba(0, 0, 0, 0.22);
+  --chip-r: 17px;
+  --hero-size: 40px;
+  --hero-weight: 200;
+  --hero-tracking: -0.03em;
+
+  --sw-w: 51px;
+  --sw-h: 31px;
+  --sw-r: 16px;
+  --sw-thumb: 27px;
+  --sw-off: var(--sep);
+  --sw-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  --seg-r: 5px;
+  --seg-line: var(--tint);
+  --seg-text: var(--tint-text);
+
+  --btn-r: 5px;
+  --btn-border: transparent;
+  --btn-hover-bg: transparent;
+  --btn-hover-color: var(--tint-text);
+  --btn-press-bg: transparent;
+  --btn-press-color: var(--tint-text);
+  --btn-press-border: transparent;
+  --btn-press-move: none;
+  --primary-hover-bg: var(--tint);
+  --danger-border: transparent;
+  --danger-press-bg: transparent;
+  --danger-press-color: var(--danger);
+
+  --card-border: 0;
+  --card-radius: 0;
+
+  --modal-r: 14px;
+  --overlay: rgba(0, 0, 0, 0.4);
+}
+
+:root[data-skin="flat"][data-theme="dark"] {
+  --bar: rgba(20, 20, 22, 0.8);
+  --bar-line: rgba(255, 255, 255, 0.16);
+  --sw-off: #39393d;
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-skin="flat"] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button):not(.primary):hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+:root[data-skin="flat"] button:not(.nav, .tab, .preset, .trial, .choice, .theme-tile, .status, .result, .toggle, .ghost, .segmented > button):active:not(:disabled) {
+  opacity: 0.35;
+}

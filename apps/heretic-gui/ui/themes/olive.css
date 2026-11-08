@@ -1,0 +1,229 @@
+/* Olive. Dark: olive windows with raised bevels (light top-left, dark bottom-right), sunken fields,
+   Tahoma, yellow section labels, a block progress bar. Light: Windows 95/98, gray #c0c0c0 plates
+   with a double bevel, sunken presses and white fields, a window title bar in an accent gradient. */
+
+:root[data-skin="olive"] {
+  --bar: #4c5844;
+  --bar-line: #282e22;
+  --thumb: #d8ded3;
+  --shadow-soft: rgba(0, 0, 0, 0.5);
+  --chip-r: 0;
+  --bevel-hi: #889180;
+  --bevel-lo: #282e22;
+  --inset-bg: #3e4637;
+  --raised: inset 1px 1px 0 var(--bevel-hi), inset -1px -1px 0 var(--bevel-lo);
+  --sunken: inset 1px 1px 0 var(--bevel-lo), inset -1px -1px 0 var(--bevel-hi);
+  --base-size: 13px;
+  --hero-size: 18px;
+  --hero-weight: 400;
+  --hero-tracking: 0.04em;
+  --hero-transform: uppercase;
+  --hero-color: var(--tint);
+  --title-weight: 400;
+  --title-transform: uppercase;
+  --title-color: var(--tint);
+
+  --sw-w: 30px;
+  --sw-h: 16px;
+  --sw-r: 0;
+  --sw-thumb: 10px;
+  --sw-thumb-r: 0;
+  --sw-pad: 3px;
+  --sw-off: var(--inset-bg);
+  --sw-on: var(--inset-bg);
+  --sw-shadow: none;
+  --sw-track-shadow: var(--sunken);
+  --sw-track-shadow-on: var(--sunken);
+  --thumb-on: var(--tint);
+  --seg-r: 0;
+  --seg-line: var(--bevel-lo);
+  --seg-text: var(--text-2);
+  --seg-item-shadow: var(--raised);
+  --seg-on: var(--surface-press);
+  --seg-on-text: var(--tint);
+  --seg-on-shadow: var(--sunken);
+
+  --field-line: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
+  --field-r: 0;
+
+  --btn-r: 0;
+  --btn-bg: var(--surface);
+  --btn-border: var(--bevel-hi) var(--bevel-lo) var(--bevel-lo) var(--bevel-hi);
+  --btn-color: var(--text);
+  --btn-weight: 400;
+  --btn-hover-bg: color-mix(in srgb, var(--surface) 90%, #ffffff);
+  --btn-press-bg: var(--surface-press);
+  --btn-press-color: var(--tint);
+  --btn-press-border: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
+  --btn-press-move: none;
+  --primary-bg: var(--surface-press);
+  --primary-border: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
+  --primary-color: var(--tint);
+  --primary-hover-bg: color-mix(in srgb, var(--surface-press) 90%, #ffffff);
+  --primary-press-bg: var(--surface-press);
+  --primary-press-color: var(--tint);
+  --danger-bg: var(--surface);
+  --danger-border: var(--btn-border);
+
+  --card-border: 1px solid;
+  --card-radius: 0;
+
+  --side-shadow: inset -1px 0 0 var(--bevel-hi);
+  --side-item-r: 0;
+  --side-gap: 4px;
+  --side-item-shadow: var(--raised);
+  --side-hover-bg: color-mix(in srgb, var(--surface) 90%, #ffffff);
+  --side-active-bg: var(--surface-press);
+  --side-active-color: var(--tint);
+  --side-active-icon: var(--tint);
+  --side-active-shadow: var(--sunken);
+
+  --meter-h: 12px;
+  --meter-r: 0;
+  --meter-track: var(--inset-bg);
+  --meter-track-shadow: var(--sunken);
+  --meter-fill: repeating-linear-gradient(90deg, var(--tint) 0 7px, transparent 7px 9px);
+
+  --log-bg: var(--inset-bg);
+  --log-border: 1px solid;
+  --bubble-r: 0;
+
+  --modal-r: 0;
+  --modal-border: 1px solid var(--bevel-hi);
+  --modal-shadow: var(--raised), 0 10px 30px rgba(0, 0, 0, 0.5);
+  --modal-head-text: var(--tint);
+}
+
+/* Light: Windows 95/98. */
+:root[data-skin="olive"][data-theme="light"] {
+  --bar: #c0c0c0;
+  --bar-line: #808080;
+  --thumb: #000000;
+  --shadow-soft: rgba(0, 0, 0, 0.35);
+  --bevel-hi: #ffffff;
+  --bevel-lo: #808080;
+  --inset-bg: #ffffff;
+  --raised: inset -1px -1px #000000, inset 1px 1px #ffffff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+  --sunken: inset 1px 1px #000000, inset -1px -1px #ffffff, inset 2px 2px #808080, inset -2px -2px #dfdfdf;
+  --field-sunken: inset 1px 1px #808080, inset -1px -1px #ffffff, inset 2px 2px #000000, inset -2px -2px #dfdfdf;
+  --hero-color: #000000;
+  --hero-transform: none;
+  --hero-weight: 700;
+  --title-color: #000000;
+  --title-transform: none;
+  --title-weight: 700;
+  --sw-off: #ffffff;
+  --sw-on: #ffffff;
+  --sw-track-shadow: var(--field-sunken);
+  --sw-track-shadow-on: var(--field-sunken);
+  --seg-line: transparent;
+  --seg-text: #000000;
+  --seg-on: #c0c0c0;
+  --seg-on-text: #000000;
+  --field-line: transparent;
+  --field-shadow: var(--field-sunken);
+  --btn-bw: 0px;
+  --btn-bg: #c0c0c0;
+  --btn-color: #000000;
+  --btn-shadow: var(--raised);
+  --btn-hover-bg: #c8c8c8;
+  --btn-press-bg: #c0c0c0;
+  --btn-press-color: #000000;
+  --btn-press-shadow: var(--sunken);
+  --primary-bg: #c0c0c0;
+  --primary-color: #000000;
+  --primary-shadow: 0 0 0 1px #000000, var(--raised);
+  --primary-hover-bg: #c8c8c8;
+  --primary-press-bg: #c0c0c0;
+  --primary-press-color: #000000;
+  --danger-bg: #c0c0c0;
+  --danger-color: #a8321e;
+  --card-border: 0;
+  --card-shadow: var(--raised);
+  --card-hover-bg: #c8c8c8;
+  --side-shadow: inset -1px 0 #808080;
+  --side-text: #000000;
+  --side-hover-bg: #c8c8c8;
+  --side-active-bg: #c0c0c0;
+  --side-active-color: #000000;
+  --side-active-icon: var(--tint);
+  --meter-fill: repeating-linear-gradient(90deg, var(--tint) 0 8px, transparent 8px 10px);
+  --meter-track-shadow: var(--field-sunken);
+  --log-border: 0;
+  --modal-bg: #c0c0c0;
+  --modal-border: 0;
+  --modal-shadow: var(--raised), 2px 2px 0 rgba(0, 0, 0, 0.3);
+  --modal-head-bg: linear-gradient(90deg, var(--tint), color-mix(in srgb, var(--tint) 45%, #ffffff));
+  --modal-head-text: #ffffff;
+  --overlay: rgba(0, 0, 0, 0.25);
+}
+
+:root[data-skin="olive"] .card,
+:root[data-skin="olive"] .log,
+:root[data-skin="olive"] .card-preview {
+  border-color: var(--bevel-hi) var(--bevel-lo) var(--bevel-lo) var(--bevel-hi);
+}
+
+:root[data-skin="olive"] .log,
+:root[data-skin="olive"] .card-preview {
+  border-color: var(--bevel-lo) var(--bevel-hi) var(--bevel-hi) var(--bevel-lo);
+}
+
+:root[data-skin="olive"][data-theme="light"] .log,
+:root[data-skin="olive"][data-theme="light"] .card-preview {
+  box-shadow: var(--field-sunken);
+}
+
+:root[data-skin="olive"] input[type="checkbox"]::before {
+  background: var(--text-3);
+}
+
+:root[data-skin="olive"] input[type="checkbox"]:checked::before {
+  background: var(--thumb-on);
+}
+
+/* Light: the brand row is a window title bar. */
+:root[data-skin="olive"][data-theme="light"] .brand {
+  height: 28px;
+  margin: -16px -12px 16px;
+  padding: 0 12px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--tint) 60%, #000000), color-mix(in srgb, var(--tint) 80%, #ffffff));
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+:root[data-skin="olive"][data-theme="light"] .brand .icon {
+  color: #ffffff;
+}
+
+:root[data-skin="olive"] .modal > .modal-head {
+  padding: 6px 6px 6px 12px;
+}
+
+:root[data-skin="olive"] .modal > .modal-head h2 {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 700;
+}
+
+:root[data-skin="olive"] .modal > .modal-head button.ghost {
+  width: 22px;
+  min-height: 20px;
+  height: 20px;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--raised);
+}
+
+:root[data-skin="olive"] .modal > .modal-head button.ghost .icon {
+  width: 12px;
+  height: 12px;
+}
+
+:root[data-skin="olive"] .modal > .modal-head button.ghost svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 2.5;
+}

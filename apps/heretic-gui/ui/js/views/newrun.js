@@ -179,16 +179,28 @@ export function mount(root) {
                 ? h("span", { class: "badge good" }, t("modelSupported"))
                 : h("span", { class: "badge bad" }, t("modelUnsupported")),
             ),
-            h(
-              "div",
-              { class: "facts" },
-              fact(t("modelArchitecture"), m.architectures.join(", ") || m.model_type || "?"),
-              fact(t("modelLayers"), m.layers ?? "?"),
-              fact(t("modelWeights"), formatBytes(m.weights_bytes)),
-              fact(t("modelVram"), formatBytes(estimateVram(m.weights_bytes, m.checkpoint_dtype, dtype))),
-            ),
+            m.model_type || m.architectures.length
+              ? h(
+                  "div",
+                  { class: "facts" },
+                  fact(t("modelArchitecture"), m.architectures.join(", ") || m.model_type || "?"),
+                  fact(t("modelLayers"), m.layers ?? "?"),
+                  fact(t("modelWeights"), formatBytes(m.weights_bytes)),
+                  fact(t("modelVram"), formatBytes(estimateVram(m.weights_bytes, m.checkpoint_dtype, dtype))),
+                )
+              : null,
             m.multimodal ? h("p", { class: "muted small" }, t("modelMultimodal")) : null,
-            m.message ? h("div", { class: "error-box" }, m.message) : null,
+            m.problem
+              ? h(
+                  "div",
+                  { class: "error-box problem" },
+                  h("b", null, t(`problem_${m.problem}`)),
+                  h("p", null, t(`problem_${m.problem}_hint`)),
+                  m.message ? h("p", { class: "mono small muted" }, `${t("modelDetails")}: ${m.message}`) : null,
+                )
+              : m.message
+                ? h("div", { class: "error-box" }, m.message)
+                : null,
           ),
           h(
             "div",

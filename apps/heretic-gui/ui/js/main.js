@@ -11,6 +11,7 @@ import * as run from "./views/run.js";
 import * as results from "./views/results.js";
 import * as chat from "./views/chat.js";
 import * as settings from "./views/settings.js";
+import { dismissUpdate, initUpdates, installLabel, installProgress, installUpdate, openReleaseNotes, showNotice } from "./update.js";
 
 const VIEWS = { home, new: newRun, run, results, chat, settings };
 
@@ -25,13 +26,14 @@ const NAV = [
 
 const nav = h("nav");
 const statusBox = h("div");
+const updateBox = h("div");
 const main = h("main");
 
 document.getElementById("app").append(
   h(
     "div",
     { class: "layout" },
-    h("aside", null, h("div", { class: "brand" }, icon("step", 20), "Heretic"), nav, h("span", { class: "grow" }), statusBox),
+    h("aside", null, h("div", { class: "brand" }, icon("step", 20), "Heretic"), nav, h("span", { class: "grow" }), updateBox, statusBox),
     main,
   ),
 );
@@ -49,7 +51,40 @@ function mountView(force = false) {
   main.scrollTop = 0;
 }
 
+/** Quiet notice about a new release, above the run status. */
+function renderUpdate() {
+  if (!showNotice() && state.updateBusy !== "installing") {
+    replace(updateBox);
+    return;
+  }
+  const update = state.update;
+  const progress = installProgress();
+  replace(
+    updateBox,
+    h(
+      "div",
+      { class: "update-notice card stack tight", role: "status" },
+      h(
+        "span",
+        { class: "row" },
+        h("span", { class: "badge accent" }, t("updateAvailable")),
+        h("span", { class: "num faint small" }, `v${update.latest}`),
+      ),
+      progress ??
+        h(
+          "div",
+          { class: "row" },
+          h("button", { class: "primary small", onclick: installUpdate }, icon("download"), installLabel()),
+          h("button", { class: "ghost small", onclick: dismissUpdate }, t("updateLater")),
+        ),
+      progress ? null : h("button", { class: "link small", onclick: openReleaseNotes }, t("updateNotes")),
+      state.updateError ? h("span", { class: "small bad-text" }, state.updateError) : null,
+    ),
+  );
+}
+
 function renderShell() {
+  renderUpdate();
   replace(
     nav,
     NAV.map(([view, name, label, enabled]) =>
@@ -108,6 +143,8 @@ async function start() {
   } catch (error) {
     console.error(error);
   }
+  // Network trouble must not break the start; check failures stay out of the interface.
+  initUpdates().catch((error) => console.warn(error));
 }
 
 // Handle for debugging and UI tests (ui-test/).

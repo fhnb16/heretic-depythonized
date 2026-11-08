@@ -1,0 +1,121 @@
+/* Plain: a link aggregator. Beige sheet, header filled with the accent, small Verdana, no shadows,
+   no radii, no cards: rows of links one under another. */
+
+:root[data-skin="plain"] {
+  --bar: #f6f6ef;
+  --bar-line: #e0e0d6;
+  --shadow-soft: transparent;
+  --chip-r: 2px;
+  --base-size: 13px;
+  --hero-size: 20px;
+  --hero-weight: 700;
+  --title-weight: 700;
+
+  --sw-w: 34px;
+  --sw-h: 16px;
+  --sw-r: 2px;
+  --sw-thumb: 12px;
+  --sw-thumb-r: 1px;
+  --sw-off: #d6d6cc;
+  --sw-shadow: none;
+  --seg-r: 2px;
+  --seg-line: #767676;
+  --seg-text: #000000;
+  --seg-on: color-mix(in srgb, var(--tint) 18%, var(--surface));
+  --seg-on-text: #000000;
+
+  --btn-r: 2px;
+  --btn-bg: #efefef;
+  --btn-border: #767676;
+  --btn-color: #000000;
+  --btn-weight: 400;
+  --btn-hover-bg: #e4e4e4;
+  --btn-press-bg: color-mix(in srgb, var(--tint) 22%, var(--surface));
+  --btn-press-color: #000000;
+  --btn-press-border: #767676;
+  --btn-press-move: none;
+  --primary-bg: color-mix(in srgb, var(--tint) 22%, var(--surface));
+  --primary-border: #767676;
+  --primary-color: #000000;
+  --primary-hover-bg: color-mix(in srgb, var(--tint) 30%, var(--surface));
+  --primary-press-bg: color-mix(in srgb, var(--tint) 36%, var(--surface));
+  --danger-bg: #efefef;
+  --danger-border: #767676;
+
+  --card-bg: transparent;
+  --card-border: 0;
+  --card-radius: 0;
+  --card-hover-bg: var(--surface-press);
+
+  --side-shadow: inset -2px 0 0 var(--tint);
+  --side-border: 0;
+  --side-item-r: 0;
+  --side-active-bg: transparent;
+  --side-active-color: var(--text);
+  --side-active-icon: var(--text);
+  --side-hover-bg: var(--surface-press);
+
+  --meter-r: 0;
+  --bubble-r: 0;
+
+  --modal-r: 0;
+  --modal-border: 1px solid var(--sep-strong);
+  --modal-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+  --modal-head-border: 1px solid var(--sep-strong);
+}
+
+:root[data-skin="plain"][data-theme="dark"] {
+  --bar: #1c1c19;
+  --bar-line: #2e2e29;
+  --sw-off: #45453e;
+  --seg-line: #6b6b62;
+  --seg-text: #e6e6dc;
+  --seg-on: color-mix(in srgb, var(--tint) 26%, var(--surface));
+  --seg-on-text: #e6e6dc;
+  --btn-bg: #2a2a25;
+  --btn-border: #6b6b62;
+  --btn-color: #e6e6dc;
+  --btn-hover-bg: #34342e;
+  --btn-press-bg: color-mix(in srgb, var(--tint) 30%, var(--surface));
+  --btn-press-color: #e6e6dc;
+  --btn-press-border: #6b6b62;
+  --primary-bg: color-mix(in srgb, var(--tint) 30%, var(--surface));
+  --primary-border: #6b6b62;
+  --primary-color: #e6e6dc;
+  --primary-hover-bg: color-mix(in srgb, var(--tint) 38%, var(--surface));
+  --primary-press-bg: color-mix(in srgb, var(--tint) 44%, var(--surface));
+  --danger-bg: #2a2a25;
+  --danger-border: #6b6b62;
+}
+
+/* Cards are rows separated by a hairline. */
+:root[data-skin="plain"] .card {
+  border-bottom: 1px solid var(--sep);
+}
+
+:root[data-skin="plain"] .modal.card {
+  border: var(--modal-border);
+}
+
+/* The accent-filled header: the brand row. */
+:root[data-skin="plain"] .brand {
+  height: 32px;
+  margin: -16px -12px 16px;
+  padding: 0 12px;
+  background: var(--tint);
+  color: var(--on-tint);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+:root[data-skin="plain"] .brand .icon {
+  color: var(--on-tint);
+}
+
+:root[data-skin="plain"] .nav.active {
+  font-weight: 700;
+}
+
+:root[data-skin="plain"] .modal > .modal-head h2 {
+  font-size: 14px;
+}
