@@ -247,6 +247,124 @@ const en = {
   presetEmotionsDesc: "Shift the emotional coloring of responses",
   presetTerse: "Terse",
   presetTerseDesc: "Short answers that stay on topic",
+  presetDefaultMore:
+    "Measured by: how many of 100 harmful requests the model refuses (“I can't help with that”). Learns from harmless vs harmful requests.",
+  presetNoslopMore:
+    "Measured by: how many short stories contain stock phrases like “tapestry” or “a testament to”. Learns from plain vs flowery writing.",
+  presetNosycoMore:
+    "Measured by: how often the model praises the question or the user instead of answering. Learns from neutral vs flattering answers.",
+  presetNohumorMore: "Measured by: how many answers turn into jokes. Learns from ordinary requests vs requests for jokes.",
+  presetTerseMore:
+    "Measured by: the average length of answers. Learns from a terse assistant vs a talkative one. Needs the benchmark scorer, which isn't available in this version yet.",
+  presetEmotionsMore:
+    "Measured by: a small emotion-recognition model that rates each answer. Needs the classifier scorer, which isn't available in this version yet.",
+  goalCustomMore: "For experts: a config.toml with your own prompts, keywords and settings.",
+  goalMultiHint: "You can pick several goals. They are combined into one edit.",
+  goalCombined:
+    "Combined goals: {goals}. Heretic looks for one edit that achieves all of them at once and measures each goal separately. More goals need more trials, so give it at least 150.",
+
+  helpHowTitle: "How does Heretic change a model? (simple explanation)",
+  helpHowBody:
+    "Imagine the model as a huge machine with millions of tiny knobs. Somewhere inside, some knobs together make a habit, for example “refuse when the question sounds dangerous”.\n\n" +
+    "**1. Finding the habit.** Heretic shows the model two piles of questions: ordinary ones (“how do I bake bread”) and ones that trigger the habit (“how do I pick a lock”). It looks at what happens inside the model in both cases and finds the difference. That difference is the habit.\n\n" +
+    "**2. Turning it down.** Heretic adds a small correction that weakens exactly that difference. It doesn't retrain the model and doesn't touch anything else on purpose.\n\n" +
+    "**3. Trying many strengths.** Too weak and the habit stays; too strong and the model gets dumber. So Heretic tries many variants (“trials”), and for each one it measures two things: how much of the habit is left, and how much the model changed in general.\n\n" +
+    "**4. You choose.** At the end you see the best variants and pick the one you like, chat with it, and save it.",
+  helpCombineTitle: "What happens when I pick several goals?",
+  helpCombineBody:
+    "Heretic merges the goals into one run:\n\n" +
+    "- The “bad” examples of all goals go into one pile, the “good” ones into another. The correction removes what all unwanted habits have in common.\n" +
+    "- Each goal keeps its own measurement (refusals, slop, flattery…), and the search looks for variants that are good on all of them at once.\n" +
+    "- How much the model changed is measured on the ordinary questions of all goals together.\n\n" +
+    "Combining works best for related habits (refusals + flattery). Goals that pull in different directions (terse + emotional) may get in each other's way; then run them one after another: save the result of the first run and use it as the model for the second.",
+  helpModelTitle: "Which model fits?",
+  helpModelBody:
+    "- **A chat model.** Its name usually contains “Instruct”, “-it” or “Chat”. Base models without a chat template don't work.\n" +
+    "- **The original format.** A folder with config.json and *.safetensors files, or a Hugging Face ID like Qwen/Qwen3.5-0.8B. GGUF files don't work as input, but you can save the result as GGUF.\n" +
+    "- **Fits into memory.** “Memory needed” should be smaller than your video memory (VRAM). An 8 GB card fits models up to about 3–4B parameters in bfloat16. If it doesn't fit, Heretic can run on the CPU, but much slower.\n" +
+    "- **Supported families:** Llama, Mistral, Qwen2/2.5, Qwen3, Qwen3.5, Gemma 1–4. To try things out quickly, take a small model (0.5–1.5B).",
+  helpTrialsTitle: "What is a trial and how many do I need?",
+  helpTrialsBody:
+    "A trial is one attempt: Heretic picks a strength and a place for the correction, applies it, and tests the model on a set of questions. That's like one shot at a target.\n\n" +
+    "- The first ~30 trials are random, to get a feel for the space.\n" +
+    "- After that each trial learns from the previous ones and aims better.\n" +
+    "- **30–50** for a quick look, **100** for a good result, **200+** when you combine goals or want the very best variant.\n\n" +
+    "One trial takes from a few seconds (small model, GPU) to a few minutes (large model, CPU). The run page shows how long is left. You can stop at any time and continue later; nothing is lost.",
+  paramsMethodHint: "ARA usually damages the model less. Abliteration is simpler and faster.",
+  helpMethodTitle: "ARA or Abliteration, what's the difference?",
+  helpMethodBody:
+    "Both methods remove the same habit, they just do it differently.\n\n" +
+    "**Abliteration** is like an eraser. Heretic computes one “direction” inside the model, an arrow that points from ordinary answers toward the unwanted ones, and erases that arrow from the model's weights. It's quick, simple and well known. But the arrow is an average, so it can also erase a bit of what the model needed elsewhere.\n\n" +
+    "**ARA** (Arbitrary-Rank Ablation) is like a careful sculptor. Instead of one arrow it learns a small correction that moves every unwanted answer toward the nearest ordinary answers, while keeping everything else in place. It takes longer to prepare (a few minutes before the trials start), but the model usually stays smarter at the same level of habit removal.\n\n" +
+    "**What to choose:** ARA by default. Abliteration if ARA is too slow on your computer, or to compare the two.",
+  paramsResponseLengthHint: "How long answers are when the model is tested. One token is about ¾ of an English word.",
+  helpHardwareTitle: "Device and precision in simple words",
+  helpHardwareBody:
+    "**Device.** The graphics card (CUDA, NVIDIA only) is 10–50 times faster than the processor (CPU). “Auto” uses the card if this build supports it and there is one.\n\n" +
+    "**Precision** is how many digits the model uses for each number:\n\n" +
+    "- **bfloat16**: 2 bytes per number. The best choice for RTX 30xx/40xx/50xx cards.\n" +
+    "- **float16**: also 2 bytes. For older cards (GTX 10xx/16xx, RTX 20xx). Some models overflow in it.\n" +
+    "- **float32**: 4 bytes, twice the memory, slower on the card. For the CPU or when a model misbehaves in 16-bit.\n" +
+    "- **Auto**: tries the precision the model was saved in, then the others, and takes the first that works.",
+  paramsSystemPromptHint: "A note the model reads before every question. Leave the default if unsure.",
+  helpSystemTitle: "What is a system prompt?",
+  helpSystemBody:
+    "A system prompt is an instruction the model receives before every conversation: who it is and how to behave. The user doesn't see it, but the model always follows it.\n\n" +
+    "**In a run** the system prompt is used for all test questions. Keep it neutral (“You are a helpful assistant.”) so the edit works for any later use. A special prompt here makes the edit fit that prompt only.\n\n" +
+    "**In the chat** you can change it freely to see how the edited model behaves in different roles. Some goals set their own system prompt for their examples (for example “Less slop” uses a writer's prompt), and that stays as is.",
+  helpTomlTitle: "What is this text?",
+  helpTomlBody:
+    "This is the full configuration of the run in TOML format: everything the form above sets plus dozens of expert settings (datasets, keywords, search ranges). You can edit it and press “Apply”, or save it as config.toml for the command-line version. If you don't know what a setting does, leave it alone; the defaults are sensible.",
+  spExamples: "Examples, click to use:",
+  spEmpty: "None",
+  spEmptyValue: "",
+  spAssistant: "Helpful assistant",
+  spAssistantValue: "You are a helpful assistant.",
+  spWriter: "Writer",
+  spWriterValue: "You are a professional writer.",
+  spTerse: "Brief",
+  spTerseValue: "You are a concise assistant. Answer in as few words as possible, without introductions.",
+  spCoder: "Programmer",
+  spCoderValue: "You are an expert programmer. Answer with working code and a short explanation.",
+  spTeacher: "Teacher",
+  spTeacherValue: "You are a patient teacher. Explain step by step in simple words, with an example.",
+  spRussian: "Answer in Russian",
+  spRussianValue: "You are a helpful assistant. Always answer in Russian.",
+  spRoleplay: "Character",
+  spRoleplayValue:
+    "You are Captain Mara Voss, a gruff but kind starship captain. Stay in character and speak in the first person.",
+  chatSystemHint: "Changes take effect with the next message. Clear the chat to start the conversation over.",
+  helpRunTitle: "What is happening now?",
+  helpRunBody:
+    "- **Loading model**: reading the weights from disk into memory.\n" +
+    "- **Batch size**: finding how many questions fit into memory at once; more means faster.\n" +
+    "- **Response prefix**: checking whether answers always start the same way (for example with a thinking block) so it can be skipped.\n" +
+    "- **Baseline**: measuring the original model so every trial can be compared with it.\n" +
+    "- **Analysis**: finding the habit inside the model (for ARA this also prepares the correction).\n" +
+    "- **Optimization**: the trials themselves. Each dot on the chart is one trial: further left means less of the habit, lower means less damage.\n\n" +
+    "“Stop after this trial” finishes cleanly and keeps everything; you can continue the run later from the home page.",
+  helpResultsTitle: "How do I read these numbers and which trial do I pick?",
+  helpResultsBody:
+    "Every trial has two kinds of numbers:\n\n" +
+    "- **The goal** (for example “Refusals 3/100”): how often the unwanted habit still shows up. Lower is better. The original model is shown for comparison.\n" +
+    "- **KL divergence**: how much the model changed on ordinary questions. 0 means not at all. Below 0.1 you won't notice a difference, 0.1–0.5 is small, above 1 the model may get noticeably worse.\n\n" +
+    "The list shows only the **best trade-offs** (the Pareto front): for each of them, no other trial is better on both numbers at once. The staircase line on the chart connects them.\n\n" +
+    "**How to choose:** start with the trial that has a low goal number and KL below about 0.3. Click “Chat” and talk to it. If the habit is still there, take a trial further left; if answers got worse, take one further down. Nothing is saved until you press “Save”.",
+  helpChatTitle: "How to test the edited model",
+  helpChatBody:
+    "- **Modified** talks to the selected trial, **Original** to the model before the edit, **Compare side by side** sends the same message to both side by side.\n" +
+    "- Ask the kind of question the goal was about (for refusals: something the original refuses) and a few everyday ones (maths, a recipe, code) to check that the model didn't get dumber.\n" +
+    "- Answers are generated on your computer; nothing is sent anywhere.",
+  helpExportTitle: "Which format should I save in?",
+  helpExportBody:
+    "- **Full model**: a complete copy of the model with the edit built in, in the same format as the original. Works everywhere (Transformers, vLLM, text-generation-webui). Takes as much disk space as the original.\n" +
+    "- **LoRA adapter only**: just the correction, a few megabytes. To use it you need the original model and a program that can apply LoRA. Good for sharing or keeping several variants.\n" +
+    "- **GGUF**: one file for llama.cpp, LM Studio, Ollama and koboldcpp. Can be compressed (“quantized”): Q4_K_M is about 3.5 times smaller with little quality loss and is the usual choice; Q8_0 is almost lossless; F16/BF16 are not compressed. Compression needs llama.cpp (choose its folder in Settings).\n\n" +
+    "**Hugging Face** uploads the full model or the adapter to your account. You need an access token with write permission: huggingface.co/settings/tokens.",
+  helpStorageTitle: "What is stored where?",
+  helpStorageBody:
+    "- **Run checkpoints**: every run saves all its trials in a small .jsonl file here. That's how you can stop and continue later or reopen results. Deleting a run deletes this file only.\n" +
+    "- **Model cache**: models and datasets downloaded from Hugging Face. They can take many gigabytes; delete the folders of models you no longer need to free space.",
 };
 
 const ru = {
@@ -493,6 +611,124 @@ const ru = {
   presetEmotionsDesc: "Сдвинуть эмоциональную окраску ответов",
   presetTerse: "Лаконичность",
   presetTerseDesc: "Короткие ответы по делу",
+  presetDefaultMore:
+    "Как измеряется: сколько из 100 опасных просьб модель отклоняет («Я не могу с этим помочь»). Учится на разнице между обычными и опасными просьбами.",
+  presetNoslopMore:
+    "Как измеряется: в скольких коротких рассказах встречаются заезженные обороты вроде «гобелен судеб» или «свидетельство тому». Учится на разнице между простым и вычурным текстом.",
+  presetNosycoMore:
+    "Как измеряется: как часто модель хвалит вопрос или собеседника вместо ответа. Учится на разнице между нейтральными и льстивыми ответами.",
+  presetNohumorMore: "Как измеряется: сколько ответов превращаются в шутки. Учится на разнице между обычными просьбами и просьбами пошутить.",
+  presetTerseMore:
+    "Как измеряется: средняя длина ответов. Учится на разнице между лаконичным и болтливым ассистентом. Нужен оценщик-бенчмарк, которого в этой версии пока нет.",
+  presetEmotionsMore:
+    "Как измеряется: небольшая модель распознавания эмоций оценивает каждый ответ. Нужен оценщик-классификатор, которого в этой версии пока нет.",
+  goalCustomMore: "Для опытных: config.toml со своими промптами, ключевыми словами и настройками.",
+  goalMultiHint: "Можно выбрать несколько целей сразу, они объединятся в одну правку.",
+  goalCombined:
+    "Цели вместе: {goals}. Heretic ищет одну правку, которая решает их все сразу, и измеряет каждую цель отдельно. Чем больше целей, тем больше нужно попыток, поставьте хотя бы 150.",
+
+  helpHowTitle: "Как Heretic меняет модель? (простыми словами)",
+  helpHowBody:
+    "Представьте модель как огромную машину с миллионами крошечных ручек. Где-то внутри несколько ручек вместе образуют привычку, например «отказывать, если вопрос звучит опасно».\n\n" +
+    "**1. Найти привычку.** Heretic показывает модели две стопки вопросов: обычные («как испечь хлеб») и те, что вызывают привычку («как вскрыть замок»). Он смотрит, что происходит внутри модели в обоих случаях, и находит разницу. Эта разница и есть привычка.\n\n" +
+    "**2. Приглушить её.** Heretic добавляет маленькую поправку, которая ослабляет именно эту разницу. Он не переобучает модель и специально ничего другого не трогает.\n\n" +
+    "**3. Попробовать разную силу.** Слишком слабо, и привычка останется; слишком сильно, и модель поглупеет. Поэтому Heretic перебирает много вариантов («попыток») и для каждого измеряет две вещи: сколько осталось от привычки и насколько вообще изменилась модель.\n\n" +
+    "**4. Вы выбираете.** В конце вы видите лучшие варианты, выбираете понравившийся, общаетесь с ним и сохраняете.",
+  helpCombineTitle: "Что будет, если выбрать несколько целей?",
+  helpCombineBody:
+    "Heretic объединит цели в один запуск:\n\n" +
+    "- «Плохие» примеры всех целей складываются в одну стопку, «хорошие» в другую. Поправка убирает то, что общее у всех нежелательных привычек.\n" +
+    "- У каждой цели остаётся своя мерка (отказы, шаблонность, лесть…), и поиск ищет варианты, хорошие сразу по всем.\n" +
+    "- Насколько изменилась модель, измеряется на обычных вопросах всех целей вместе.\n\n" +
+    "Лучше всего сочетаются родственные привычки (отказы + лесть). Цели, которые тянут в разные стороны (лаконичность + эмоциональность), могут мешать друг другу. Тогда запускайте их по очереди: сохраните результат первого запуска и выберите его как модель для второго.",
+  helpModelTitle: "Какая модель подойдёт?",
+  helpModelBody:
+    "- **Модель для чата.** В названии обычно есть «Instruct», «-it» или «Chat». Базовые модели без шаблона чата не подойдут.\n" +
+    "- **Исходный формат.** Папка с config.json и файлами *.safetensors или ID на Hugging Face вроде Qwen/Qwen3.5-0.8B. GGUF на вход не подходит, но результат можно сохранить в GGUF.\n" +
+    "- **Помещается в память.** «Нужно памяти» должно быть меньше видеопамяти (VRAM). На карту 8 ГБ помещаются модели примерно до 3–4 млрд параметров в bfloat16. Если не помещается, Heretic может работать на процессоре, но намного медленнее.\n" +
+    "- **Поддерживаемые семейства:** Llama, Mistral, Qwen2/2.5, Qwen3, Qwen3.5, Gemma 1–4. Чтобы быстро попробовать, возьмите маленькую модель (0,5–1,5 млрд).",
+  helpTrialsTitle: "Что такое попытка и сколько их нужно?",
+  helpTrialsBody:
+    "Попытка — это один вариант: Heretic выбирает силу и место поправки, применяет её и проверяет модель на наборе вопросов. Как один выстрел по мишени.\n\n" +
+    "- Первые 30 попыток случайные, чтобы осмотреться.\n" +
+    "- Дальше каждая попытка учится на предыдущих и целится точнее.\n" +
+    "- **30–50**, чтобы быстро посмотреть, **100** для хорошего результата, **200+**, если цели объединены или нужен самый лучший вариант.\n\n" +
+    "Одна попытка занимает от нескольких секунд (маленькая модель, видеокарта) до нескольких минут (большая модель, процессор). На странице запуска видно, сколько осталось. Остановить можно в любой момент и продолжить позже, ничего не потеряется.",
+  paramsMethodHint: "ARA обычно меньше портит модель. Abliteration проще и быстрее.",
+  helpMethodTitle: "ARA или Abliteration, в чём разница?",
+  helpMethodBody:
+    "Оба метода убирают одну и ту же привычку, просто по-разному.\n\n" +
+    "**Abliteration** похож на ластик. Heretic вычисляет одно «направление» внутри модели — стрелку от обычных ответов к нежелательным — и стирает эту стрелку из весов модели. Быстро, просто и хорошо изучено. Но стрелка усреднённая, поэтому заодно может стереть немного того, что модели нужно в другом месте.\n\n" +
+    "**ARA** (Arbitrary-Rank Ablation) похож на аккуратного скульптора. Вместо одной стрелки он подбирает небольшую поправку, которая сдвигает каждый нежелательный ответ к ближайшим обычным и при этом старается оставить всё остальное на месте. Подготовка дольше (несколько минут перед попытками), зато при той же силе эффекта модель обычно остаётся умнее.\n\n" +
+    "**Что выбрать:** ARA по умолчанию. Abliteration, если ARA слишком медленный на вашем компьютере или хочется сравнить.",
+  paramsResponseLengthHint: "Длина ответов при проверке модели. Один токен — примерно половина русского слова.",
+  helpHardwareTitle: "Устройство и точность простыми словами",
+  helpHardwareBody:
+    "**Устройство.** Видеокарта (CUDA, только NVIDIA) в 10–50 раз быстрее процессора (CPU). «Auto» выберет видеокарту, если она есть и эта сборка её поддерживает.\n\n" +
+    "**Точность** — сколько цифр модель хранит для каждого числа:\n\n" +
+    "- **bfloat16**: 2 байта на число. Лучший выбор для карт RTX 30xx/40xx/50xx.\n" +
+    "- **float16**: тоже 2 байта. Для старых карт (GTX 10xx/16xx, RTX 20xx). Некоторые модели в нём «переполняются».\n" +
+    "- **float32**: 4 байта, в два раза больше памяти и медленнее на видеокарте. Для процессора или если модель ведёт себя странно в 16 битах.\n" +
+    "- **Auto**: сначала пробует точность, в которой сохранена модель, потом остальные, и берёт первую, что сработала.",
+  paramsSystemPromptHint: "Записка, которую модель читает перед каждым вопросом. Если не уверены, оставьте как есть.",
+  helpSystemTitle: "Что такое системный промпт?",
+  helpSystemBody:
+    "Системный промпт — это инструкция, которую модель получает перед каждым разговором: кто она и как себя вести. Пользователь её не видит, но модель всегда ей следует.\n\n" +
+    "**В запуске** системный промпт используется для всех проверочных вопросов. Оставьте нейтральный («You are a helpful assistant.»), чтобы правка работала при любом дальнейшем использовании. Особый промпт здесь подгонит правку только под него.\n\n" +
+    "**В чате** его можно свободно менять и смотреть, как изменённая модель ведёт себя в разных ролях. У некоторых целей свой системный промпт для их примеров (например, у «Меньше шаблонности» — промпт писателя), он сохраняется.",
+  helpTomlTitle: "Что это за текст?",
+  helpTomlBody:
+    "Это полная конфигурация запуска в формате TOML: всё, что задаёт форма выше, плюс десятки настроек для опытных (наборы данных, ключевые слова, диапазоны поиска). Можно отредактировать и нажать «Применить» или сохранить как config.toml для версии командной строки. Если не знаете, что делает настройка, не трогайте её: значения по умолчанию разумные.",
+  spExamples: "Примеры, нажмите, чтобы подставить:",
+  spEmpty: "Без промпта",
+  spEmptyValue: "",
+  spAssistant: "Помощник",
+  spAssistantValue: "You are a helpful assistant.",
+  spWriter: "Писатель",
+  spWriterValue: "Ты профессиональный писатель.",
+  spTerse: "Кратко",
+  spTerseValue: "Ты лаконичный ассистент. Отвечай как можно короче, без вступлений.",
+  spCoder: "Программист",
+  spCoderValue: "Ты опытный программист. Отвечай рабочим кодом и коротким пояснением.",
+  spTeacher: "Учитель",
+  spTeacherValue: "Ты терпеливый учитель. Объясняй по шагам, простыми словами и с примером.",
+  spRussian: "Отвечать по-русски",
+  spRussianValue: "Ты полезный ассистент. Всегда отвечай на русском языке.",
+  spRoleplay: "Персонаж",
+  spRoleplayValue:
+    "Ты капитан Мара Восс, суровый, но добрый капитан звездолёта. Не выходи из роли и говори от первого лица.",
+  chatSystemHint: "Изменения действуют со следующего сообщения. Очистите чат, чтобы начать разговор заново.",
+  helpRunTitle: "Что сейчас происходит?",
+  helpRunBody:
+    "- **Загрузка модели**: веса читаются с диска в память.\n" +
+    "- **Размер батча**: сколько вопросов помещается в память за раз; больше — быстрее.\n" +
+    "- **Префикс ответа**: проверка, не начинаются ли ответы всегда одинаково (например, с блока размышлений), чтобы его пропускать.\n" +
+    "- **Базовая оценка**: измеряется исходная модель, чтобы с ней можно было сравнить каждую попытку.\n" +
+    "- **Анализ**: поиск привычки внутри модели (для ARA тут же готовится поправка).\n" +
+    "- **Оптимизация**: сами попытки. Каждая точка на графике — одна попытка: левее — меньше привычки, ниже — меньше вреда.\n\n" +
+    "«Остановить после попытки» аккуратно завершит запуск и всё сохранит; продолжить можно позже с главной страницы.",
+  helpResultsTitle: "Как читать эти числа и какую попытку выбрать?",
+  helpResultsBody:
+    "У каждой попытки два вида чисел:\n\n" +
+    "- **Цель** (например, «Отказы 3/100»): как часто нежелательная привычка ещё проявляется. Меньше — лучше. Для сравнения показана исходная модель.\n" +
+    "- **KL-дивергенция**: насколько модель изменилась на обычных вопросах. 0 — совсем не изменилась. Меньше 0,1 разницы не заметно, 0,1–0,5 — небольшая, больше 1 — модель может заметно ухудшиться.\n\n" +
+    "В списке только **лучшие компромиссы** (фронт Парето): ни одна другая попытка не лучше каждой из них сразу по обоим числам. Их соединяет ступенчатая линия на графике.\n\n" +
+    "**Как выбрать:** начните с попытки, у которой мало по цели и KL примерно меньше 0,3. Нажмите «Чат» и поговорите с ней. Если привычка осталась, возьмите попытку левее; если ответы стали хуже — ниже. Пока вы не нажмёте «Сохранить», ничего не записывается.",
+  helpChatTitle: "Как проверить изменённую модель",
+  helpChatBody:
+    "- **Изменённая** отвечает выбранной попыткой, **Оригинал** — моделью до правки, **Сравнить бок о бок** отправляет одно сообщение обеим и показывает ответы рядом.\n" +
+    "- Задайте вопросы по теме цели (для отказов — то, что исходная модель отклоняет) и несколько обычных (математика, рецепт, код), чтобы убедиться, что модель не поглупела.\n" +
+    "- Ответы генерируются на вашем компьютере, ничего никуда не отправляется.",
+  helpExportTitle: "В каком формате сохранить?",
+  helpExportBody:
+    "- **Полная модель**: целая копия модели со встроенной правкой в том же формате, что и оригинал. Работает везде (Transformers, vLLM, text-generation-webui). Занимает столько же места, сколько оригинал.\n" +
+    "- **Только LoRA-адаптер**: одна поправка, несколько мегабайт. Для использования нужны исходная модель и программа, которая умеет применять LoRA. Удобно, чтобы делиться или хранить несколько вариантов.\n" +
+    "- **GGUF**: один файл для llama.cpp, LM Studio, Ollama и koboldcpp. Можно сжать («квантовать»): Q4_K_M примерно в 3,5 раза меньше почти без потери качества, это обычный выбор; Q8_0 почти без потерь; F16/BF16 без сжатия. Для сжатия нужен llama.cpp (укажите его папку в настройках).\n\n" +
+    "**Hugging Face** загружает полную модель или адаптер в ваш аккаунт. Нужен токен доступа с правом записи: huggingface.co/settings/tokens.",
+  helpStorageTitle: "Что где хранится?",
+  helpStorageBody:
+    "- **Сохранения запусков**: каждый запуск записывает все свои попытки в небольшой файл .jsonl в этой папке. Поэтому запуск можно остановить и продолжить или снова открыть результаты. Удаление запуска удаляет только этот файл.\n" +
+    "- **Кэш моделей**: модели и наборы данных, скачанные с Hugging Face. Могут занимать много гигабайт; удалите папки ненужных моделей, чтобы освободить место.",
 };
 
 const dictionaries = { en, ru };

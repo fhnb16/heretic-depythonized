@@ -6,6 +6,7 @@ import { icon } from "../icons.js";
 import { isBusy, refreshTrials, set, state, subscribe, t } from "../store.js";
 import { scatterPlot } from "../components/scatter.js";
 import { openExport } from "./export.js";
+import { explain } from "../components/help.js";
 
 export function mount(root) {
   const list = h("div", { class: "stack" });
@@ -33,6 +34,7 @@ export function mount(root) {
       "div",
       { class: "stack-lg" },
       h("header", { class: "page-head" }, h("div", { class: "stack tight" }, h("h1", null, t("resultsTitle")), h("p", { class: "muted" }, t("resultsHint")))),
+      explain("helpResultsTitle", "helpResultsBody"),
       errorBox,
       h(
         "div",

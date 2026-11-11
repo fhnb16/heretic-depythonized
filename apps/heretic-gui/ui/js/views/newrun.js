@@ -7,15 +7,17 @@ import { h, progressBar, replace } from "../dom.js";
 import { launch, t } from "../store.js";
 import { openDialog } from "../tauri.js";
 import { modal } from "../components/widgets.js";
+import { SYSTEM_PROMPT_EXAMPLES, examples, explain } from "../components/help.js";
 import { icon } from "../icons.js";
 
+// [id, icon, title, short description, longer explanation]
 const PRESETS = [
-  ["default", "unlock", "presetDefault", "presetDefaultDesc"],
-  ["noslop", "scissors", "presetNoslop", "presetNoslopDesc"],
-  ["nosyco", "slash", "presetNosyco", "presetNosycoDesc"],
-  ["nohumor", "meh", "presetNohumor", "presetNohumorDesc"],
-  ["terse", "short", "presetTerse", "presetTerseDesc"],
-  ["emotions", "smile", "presetEmotions", "presetEmotionsDesc"],
+  ["default", "unlock", "presetDefault", "presetDefaultDesc", "presetDefaultMore"],
+  ["noslop", "scissors", "presetNoslop", "presetNoslopDesc", "presetNoslopMore"],
+  ["nosyco", "slash", "presetNosyco", "presetNosycoDesc", "presetNosycoMore"],
+  ["nohumor", "meh", "presetNohumor", "presetNohumorDesc", "presetNohumorMore"],
+  ["terse", "short", "presetTerse", "presetTerseDesc", "presetTerseMore"],
+  ["emotions", "smile", "presetEmotions", "presetEmotionsDesc", "presetEmotionsMore"],
 ];
 
 const STEPS = ["stepModel", "stepGoal", "stepParams"];
@@ -27,7 +29,8 @@ export function mount(root) {
     inspection: null,
     inspecting: false,
     inspectError: null,
-    presetId: "default",
+    // Selected goal presets (several can be combined); empty when a custom config is used.
+    presetIds: ["default"],
     settings: null,
     errors: [],
     starting: false,
@@ -65,9 +68,9 @@ export function mount(root) {
     replace(body, [modelStep, goalStep, paramsStep][step]());
   }
 
-  async function loadPreset(id) {
-    local.presetId = id;
-    const settings = await api.presetSettings(id);
+  async function loadPresets(ids) {
+    local.presetIds = ids;
+    const settings = ids.length === 1 ? await api.presetSettings(ids[0]) : await api.combinePresets(ids);
     settings.model = local.modelId;
     local.settings = settings;
   }
@@ -239,6 +242,7 @@ export function mount(root) {
       searching,
       results,
       details,
+      explain("helpModelTitle", "helpModelBody"),
     );
   }
 
@@ -260,7 +264,7 @@ export function mount(root) {
             const imported = await api.settingsFromToml(await file.text());
             imported.model = local.modelId || imported.model;
             local.settings = imported;
-            local.presetId = null;
+            local.presetIds = [];
             replace(errors);
           } catch (error) {
             replace(errors, h("div", { class: "error-box" }, String(error)));
@@ -271,38 +275,71 @@ export function mount(root) {
 
       replace(
         cards,
-        PRESETS.map(([id, name, title, description]) =>
-          h(
+        PRESETS.map(([id, name, title, description, more]) => {
+          const selected = local.presetIds.includes(id);
+          return h(
             "button",
             {
-              class: `preset card${local.presetId === id ? " active" : ""}`,
+              class: `preset card${selected ? " active" : ""}`,
+              "aria-pressed": String(selected),
               onclick: async () => {
-                await loadPreset(id);
+                // Toggle; at least one goal stays selected.
+                let ids = selected ? local.presetIds.filter((x) => x !== id) : [...local.presetIds, id];
+                if (ids.length === 0) ids = [id];
+                // Keep the catalog order so the combination doesn't depend on click order.
+                ids = PRESETS.map(([p]) => p).filter((p) => ids.includes(p));
+                try {
+                  await loadPresets(ids);
+                  replace(errors);
+                } catch (error) {
+                  replace(errors, h("div", { class: "error-box" }, String(error)));
+                }
                 render();
               },
             },
-            icon(name, 20),
+            h("span", { class: "preset-head" }, icon(name, 20), h("span", { class: "preset-check" }, icon("check", 14))),
             h("b", null, t(title)),
             h("span", { class: "muted small" }, t(description)),
-          ),
-        ),
+            h("span", { class: "preset-more" }, t(more)),
+          );
+        }),
         h(
           "label",
-          { class: `preset card${local.presetId === null ? " active" : ""}` },
-          icon("file", 20),
+          { class: `preset card${local.presetIds.length === 0 ? " active" : ""}` },
+          h("span", { class: "preset-head" }, icon("file", 20), h("span", { class: "preset-check" }, icon("check", 14))),
           h("b", null, t("goalCustom")),
           h("span", { class: "muted small" }, t("goalCustomHint")),
+          h("span", { class: "preset-more" }, t("goalCustomMore")),
           fileInput,
         ),
       );
+      replace(
+        combined,
+        local.presetIds.length > 1
+          ? h(
+              "div",
+              { class: "note" },
+              t("goalCombined", {
+                goals: local.presetIds
+                  .map((id) => t(PRESETS.find(([p]) => p === id)[2]))
+                  .join(" + "),
+              }),
+            )
+          : null,
+      );
     }
 
+    const combined = h("div");
     render();
     return h(
       "section",
       { class: "stack" },
       h("h2", null, t("goalTitle")),
+      h("p", { class: "muted" }, t("goalMultiHint")),
+      explain("helpHowTitle", "helpHowBody"),
       cards,
+      combined,
+      explain("helpCombineTitle", "helpCombineBody"),
       errors,
       h(
         "div",
@@ -344,6 +381,14 @@ export function mount(root) {
             {
               class: method() === name ? "active" : "",
               onclick: () => {
+                // Goal presets configure prompt sets for one method; carry them over.
+                const previous = s.modifier?.[method()];
+                if (previous && name !== method()) {
+                  s.modifier[name] ??= {};
+                  for (const key of ["good_prompts", "bad_prompts"]) {
+                    if (previous[key] !== undefined) s.modifier[name][key] = previous[key];
+                  }
+                }
                 s.modifiers = [{ plugin: name }];
                 renderMethod();
               },
@@ -369,12 +414,18 @@ export function mount(root) {
     const responseLength = h("input", { type: "number", min: 1, max: 4096, value: String(s.max_response_length) });
     responseLength.addEventListener("change", () => (s.max_response_length = Number(responseLength.value)));
 
-    const systemPrompt = h("input", { type: "text", value: s.system_prompt });
+    const systemPrompt = h("textarea", { rows: 3, value: s.system_prompt });
+    systemPrompt.value = s.system_prompt ?? "";
     systemPrompt.addEventListener("input", () => (s.system_prompt = systemPrompt.value));
+    const systemExamples = examples("spExamples", SYSTEM_PROMPT_EXAMPLES, (value) => {
+      systemPrompt.value = value;
+      s.system_prompt = value;
+    });
 
     const advanced = h("div", { class: "stack", hidden: true });
     const toml = h("textarea", { class: "mono", rows: 16, spellcheck: false });
     advanced.append(
+      explain("helpTomlTitle", "helpTomlBody"),
       h("label", { class: "field" }, t("paramsToml"), toml),
       h(
         "div",
@@ -418,10 +469,11 @@ export function mount(root) {
         trials,
         h("span", { class: "hint" }, t("paramsTrialsHint")),
       ),
+      explain("helpTrialsTitle", "helpTrialsBody"),
       h(
         "div",
         { class: "grid2" },
-        h("div", { class: "field" }, t("paramsMethod"), methodControl),
+        h("div", { class: "field" }, t("paramsMethod"), methodControl, h("span", { class: "hint" }, t("paramsMethodHint"))),
         h(
           "label",
           { class: "field" },
@@ -451,9 +503,25 @@ export function mount(root) {
             (v) => (s.dtypes = v === "auto" ? ["auto", "float16", "bfloat16", "float32"] : [v]),
           ),
         ),
-        h("label", { class: "field" }, t("paramsResponseLength"), responseLength),
+        h(
+          "label",
+          { class: "field" },
+          t("paramsResponseLength"),
+          responseLength,
+          h("span", { class: "hint" }, t("paramsResponseLengthHint")),
+        ),
       ),
-      h("label", { class: "field" }, t("paramsSystemPrompt"), systemPrompt),
+      explain("helpMethodTitle", "helpMethodBody"),
+      explain("helpHardwareTitle", "helpHardwareBody"),
+      h(
+        "label",
+        { class: "field" },
+        t("paramsSystemPrompt"),
+        systemPrompt,
+        h("span", { class: "hint" }, t("paramsSystemPromptHint")),
+      ),
+      systemExamples,
+      explain("helpSystemTitle", "helpSystemBody"),
       advancedToggle,
       advanced,
       errorBox,
@@ -520,7 +588,7 @@ export function mount(root) {
     await launch(structuredClone(s), action);
   }
 
-  loadPreset("default").then(() => renderTabs());
+  loadPresets(["default"]).then(() => renderTabs());
   go(0);
   return () => {};
 }

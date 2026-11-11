@@ -7,6 +7,7 @@ export const api = {
   appInfo: () => invoke("app_info"),
   presetIds: () => invoke("preset_ids"),
   presetSettings: (id) => invoke("preset_settings", { id }),
+  combinePresets: (ids) => invoke("combine_presets", { ids }),
   validateSettings: (settings) => invoke("validate_settings", { settings }),
   settingsToToml: (settings) => invoke("settings_to_toml", { settings }),
   settingsFromToml: (text) => invoke("settings_from_toml", { text }),

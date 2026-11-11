@@ -5,6 +5,7 @@ import { api } from "../api.js";
 import { h, replace } from "../dom.js";
 import { icon } from "../icons.js";
 import { state, subscribe, t } from "../store.js";
+import { SYSTEM_PROMPT_EXAMPLES, examples, explain } from "../components/help.js";
 
 export function mount(root) {
   if (!state.modelLoaded || state.appliedTrial === null) {
@@ -42,7 +43,15 @@ export function mount(root) {
       "div",
       { class: "chat" },
       h("div", { class: "row" }, modeControl, h("span", { class: "grow" }), clear),
-      h("details", { class: "system" }, h("summary", { class: "muted" }, t("chatSystem")), system),
+      h(
+        "details",
+        { class: "system" },
+        h("summary", { class: "muted" }, t("chatSystem")),
+        system,
+        examples("spExamples", SYSTEM_PROMPT_EXAMPLES, (value) => (system.value = value)),
+        h("p", { class: "muted small" }, t("chatSystemHint")),
+      ),
+      explain("helpChatTitle", "helpChatBody"),
       messages,
       errorBox,
       h("div", { class: "row composer" }, input, sendButton),

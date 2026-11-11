@@ -68,6 +68,7 @@
     app_info: { version: "2.1.0-dev.0", cuda_compiled: true, hf_cache: "C:\\Users\\me\\.cache\\huggingface\\hub", has_hf_token: false, default_checkpoint_dir: "C:\\Users\\me\\Documents\\Heretic\\checkpoints" },
     preset_ids: ["default", "noslop"],
     preset_settings: settings,
+    combine_presets: settings,
     validate_settings: [],
     settings_to_toml: 'model = "Qwen/Qwen2.5-0.5B-Instruct"\nn_trials = 100\n',
     settings_from_toml: settings,

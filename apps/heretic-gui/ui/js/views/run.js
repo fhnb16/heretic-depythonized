@@ -6,6 +6,7 @@ import { icon } from "../icons.js";
 import { isBusy, set, state, subscribe, t } from "../store.js";
 import { scatterPlot } from "../components/scatter.js";
 import { logPanel, stepper } from "../components/widgets.js";
+import { explain } from "../components/help.js";
 
 function statusLabel(status) {
   return {
@@ -38,6 +39,7 @@ export function mount(root) {
       { class: "stack-lg" },
       header,
       progress,
+      explain("helpRunTitle", "helpRunBody"),
       columns,
       h("div", { class: "card stack" }, logToggle, log.element),
     ),

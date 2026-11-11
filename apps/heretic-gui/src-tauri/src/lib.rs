@@ -106,6 +106,23 @@ fn preset_settings(id: String) -> CommandResult<Value> {
     serde_json::to_value(settings).map_err(error_string)
 }
 
+/// Settings for several goals at once (see `heretic_plugins::combine`).
+#[tauri::command]
+fn combine_presets(ids: Vec<String>) -> CommandResult<Value> {
+    let mut presets = Vec::with_capacity(ids.len());
+    for id in ids {
+        let (_, text) = PRESETS
+            .iter()
+            .find(|(preset, _)| *preset == id)
+            .ok_or_else(|| format!("Unknown preset {id}"))?;
+        let table: heretic_core::toml::Table = heretic_core::toml::from_str(text).map_err(error_string)?;
+        let settings = Settings::from_table(table).map_err(format_errors)?;
+        presets.push(heretic_plugins::combine::Preset { id, settings });
+    }
+    let combined = heretic_plugins::combine::combine_presets(&presets).map_err(|e| format!("{e:#}"))?;
+    serde_json::to_value(combined).map_err(error_string)
+}
+
 #[tauri::command]
 fn get_settings_schema() -> Value {
     settings_schema()
@@ -708,6 +725,7 @@ pub fn run() {
             app_info,
             preset_ids,
             preset_settings,
+            combine_presets,
             get_settings_schema,
             validate_settings,
             settings_to_toml,

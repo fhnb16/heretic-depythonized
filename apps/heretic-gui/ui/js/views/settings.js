@@ -5,6 +5,7 @@ import { h, replace } from "../dom.js";
 import { icon } from "../icons.js";
 import { isDark, prefs, setPref, state, subscribe, t } from "../store.js";
 import { openDialog } from "../tauri.js";
+import { explain } from "../components/help.js";
 import { DEFAULT_THEME, THEMES, themePreview } from "../themes.js";
 import { checkForUpdates, installLabel, installProgress, installUpdate, openReleaseNotes } from "../update.js";
 import { LLAMA_CPP_RELEASES, getLlamaCppDir, setLlamaCppDir } from "../llamacpp.js";
@@ -117,6 +118,7 @@ export function mount(root) {
         "section",
         { class: "card stack" },
         h("h3", null, t("settingsStorage")),
+        explain("helpStorageTitle", "helpStorageBody"),
         h(
           "label",
           { class: "field" },

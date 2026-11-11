@@ -6,6 +6,7 @@ import { h, progressBar, replace } from "../dom.js";
 import { state, subscribe, t } from "../store.js";
 import { openDialog } from "../tauri.js";
 import { modal } from "../components/widgets.js";
+import { explain } from "../components/help.js";
 import { DEFAULT_GGUF_TYPE, GGUF_TYPES, getLlamaCppDir, needsLlamaCpp } from "../llamacpp.js";
 
 export function openExport(mode) {
@@ -228,7 +229,16 @@ export function openExport(mode) {
   const close = modal({
     title: t("actionSave"),
     width: "620px",
-    body: h("div", { class: "stack" }, tabs, strategies, content, status, footer),
+    body: h(
+      "div",
+      { class: "stack" },
+      tabs,
+      strategies,
+      explain("helpExportTitle", "helpExportBody"),
+      content,
+      status,
+      footer,
+    ),
     onclose: unsubscribe,
   });
 

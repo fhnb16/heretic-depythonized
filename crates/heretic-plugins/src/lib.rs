@@ -7,6 +7,7 @@
 //! compiled in and selected by name; the fully qualified names from 2.x
 //! (e.g. `heretic.scorers.keyword_rate.KeywordRate`) are accepted as aliases.
 
+pub mod combine;
 pub mod evaluator;
 pub mod modifiers;
 pub mod scorers;
